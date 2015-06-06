@@ -1,10 +1,10 @@
 <?php require_once 'header.php';?>
             <h1>Sonification</h1>
-            <table width="600">
+            <table width="100%">
             <form action="upload.php" method="post" enctype="multipart/form-data">
             <tr>
             <td width="30%">Please select csv file</td>
-            <td width="80%"><input type="file" name="csv" value="" /></td>
+            <td width="70%"><input type="file" name="csv" value="" /></td>
             </tr>
 
             <tr>
@@ -30,23 +30,25 @@
             <br/> <br/> 
             <?php 
                 session_start();
-                if(count($_SESSION["csvArr"])>0){
-                    echo '<table>';
-                    //print_r($_SESSION["csvArr"]);
-                    for($i=0; $i<count($_SESSION["csvArr"]);$i++){
-                        $row = $_SESSION["csvArr"][$i];
-                        echo '<tr>';
-                        foreach ($row as $col){
-                            if($i==0){
-                                echo "<th>$col</th>";
-                            }else{
-                                echo "<td>$col</td>";
+                if(isset($_SESSION['csvArr']) && !empty($_SESSION['csvArr'])) {
+                    if(count($_SESSION["csvArr"])>0){
+                        echo '<table>';
+                        //print_r($_SESSION["csvArr"]);
+                        for($i=0; $i<count($_SESSION["csvArr"]);$i++){
+                            $row = $_SESSION["csvArr"][$i];
+                            echo '<tr>';
+                            foreach ($row as $col){
+                                if($i==0){
+                                    echo "<th>$col</th>";
+                                }else{
+                                    echo "<td>$col</td>";
+                                }
                             }
+                            echo '</tr>';
                         }
-                        echo '</tr>';
+                        echo '</table>';
                     }
-                    echo '</table>';
-                }
+                }   
             ?>
       
 <?php require_once 'footer.php';?>
