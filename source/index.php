@@ -1,3 +1,5 @@
 <?php require_once 'header.php';?>
-            <h1>Home</h1>
+    <div class="container fluid">
+        <h1>Home</h1>
+    </div>
 <?php require_once 'footer.php';?>
