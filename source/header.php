@@ -9,14 +9,6 @@
         <title></title>
     </head>
     <body>
-        <nav class="navbar navbar-default navbar-fixed-top ">
-                <ul class="nav text-center">
-                    <li class="col-md-4"> <a href="index.php">Home</a></li>
-                    <li class="col-md-4"> <a href="sonification.php">Sonification</a></li>
-                    <li class="col-md-4"> <a href="contact.php">Contact</a></li>
-                </ul>
-        </nav>    
-        <div class="wrapper container-fluid">
             
             
             
