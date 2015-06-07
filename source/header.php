@@ -6,7 +6,7 @@
         <meta name="description" content="Online tool for exploration of data sonification techniques">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
         <link type="text/css" rel="stylesheet" href="css/main.css">
-        <title></title>
+        <title>Online Sonification Tool</title>
     </head>
     <body>
             

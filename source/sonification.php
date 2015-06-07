@@ -1,11 +1,14 @@
-<?php require_once 'header.php';?>
+<?php 
+    session_start();
+    require_once 'header.php';
+?>
     <nav class="navbar navbar-inverse">
            <ul class="nav navbar-nav">
                <li><a href="index.php"><h4>Home</h4></a></li>
                <li class="active"><a href="sonification.php"><h4>Sonification</h4></a></li>
                <li><a href="contact.php"><h4>Contact</h4></a></li>
            </ul>
-        </nav>
+    </nav>
     <div class="wrapper ">
         <div class="container fluid">
             <h1>Sonification</h1>
@@ -37,7 +40,6 @@
         </div>
         <br/> <br/> 
         <?php 
-            session_start();
             if(isset($_SESSION['csvArr']) && !empty($_SESSION['csvArr'])) {
                 if(count($_SESSION["csvArr"])>0){
                     echo '<div class="container fluid">';
@@ -47,9 +49,9 @@
                         echo '<div class="row">';
                         foreach ($row as $col){
                             if($i==0){
-                                echo "<div class='col-md-4'><b>$col</b></div>";
+                                echo "<div class='col-md-4 name'><b>$col</b></div>";
                             }else{
-                                echo "<div class='col-md-4'>$col</div>";
+                                echo "<div class='col-md-4 value'>$col</div>";
                             }
                         }
                         echo '</div>';
@@ -60,3 +62,4 @@
         ?>
       
 <?php require_once 'footer.php';?>
+<script src="js/app.js"></script>

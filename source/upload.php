@@ -1,7 +1,8 @@
 <?php
 session_start();
 if($_FILES['csv']['tmp_name']){
-    if(explode(".",$_FILES['csv']['name'])[1]=='csv'){ //check extension
+    $fileName = explode(".",$_FILES['csv']['name']);
+    if($fileName[1]=='csv'){ //check extension
         $tmpName = $_FILES['csv']['tmp_name'];
         $_SESSION["csvArr"] = array();
 
@@ -13,13 +14,13 @@ if($_FILES['csv']['tmp_name']){
             $i++;
             array_push ($_SESSION["csvArr"], $csvrow);
         }
-        header( 'Location: '.$root.'sonification.php') ; 
+        header( 'Location: sonification.php') ; 
     }else {
-        header( 'Location: '.$root.'sonification.php?err=2');
+        header( 'Location: sonification.php?err=2');
         $_SESSION["csvArr"] = array();
     }
 }else{
-    header( 'Location: '.$root.'sonification.php?err=1'); 
+    header( 'Location: sonification.php?err=1'); 
     $_SESSION["csvArr"] = array();
 }
 ?>
