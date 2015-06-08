@@ -27,8 +27,8 @@
             </p>
             <h3>Additional sources</h3>
             <ul>
-                <li><a href="icad.org">icad.org</a></li>
-                <li><a href="sonification.de">sonification.de</a></li>
+                <li><a href="http://www.icad.org">icad.org</a></li>
+                <li><a href="http://www.sonification.de">sonification.de</a></li>
             </ul>
         </div>
 <?php require_once 'footer.php';?>
