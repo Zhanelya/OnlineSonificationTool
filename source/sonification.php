@@ -42,16 +42,16 @@
         <?php 
             if(isset($_SESSION['csvArr']) && !empty($_SESSION['csvArr'])) {
                 if(count($_SESSION["csvArr"])>0){
+                    echo '<div id="count" style="display:none">'.count($_SESSION["csvArr"][0]).'</div>'; //pass number of columns
                     echo '<div class="container fluid">';
-                    //print_r($_SESSION["csvArr"]);
                     for($i=0; $i<count($_SESSION["csvArr"]);$i++){
                         $row = $_SESSION["csvArr"][$i];
                         echo '<div class="row">';
-                        foreach ($row as $col){
+                        foreach ($row as $colNo => $col){
                             if($i==0){
-                                echo "<div class='col-md-4 name'><b>$col</b></div>";
+                                echo "<div class='col-xs-4 name-".$colNo."'><b>$col</b></div>";
                             }else{
-                                echo "<div class='col-md-4 value'>$col</div>";
+                                echo "<div class='col-xs-4 value-".$colNo."'>$col</div>";
                             }
                         }
                         echo '</div>';
@@ -62,4 +62,5 @@
         ?>
       
 <?php require_once 'footer.php';?>
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 <script src="js/app.js"></script>

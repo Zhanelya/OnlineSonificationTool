@@ -7,8 +7,28 @@ var gainNode = audioCtx.createGain();
 oscillator.connect(gainNode); 
 gainNode.connect(audioCtx.destination);  
 // create initial theremin frequency and volumn values  
+
+
+var colCount = document.getElementById("count").innerHTML; //number of columns
+var maxDataVals = new Array(colCount);
+for (var i = 0; i < colCount; i++) maxDataVals[i] = Number.MIN_VALUE;
+var minDataVals = new Array(colCount);
+for (var i = 0; i < colCount; i++) minDataVals[i] = Number.MAX_VALUE;
+
+$('[class*="value"]').each(function(){
+    var classList = this.className.split(/\s+/); //for every table value retrieve classlist
+    var colNo = (classList[1]).split('-')[1]; //column number
+    if(parseInt(this.innerHTML) < minDataVals[colNo]) minDataVals[colNo] = parseInt(this.innerHTML);
+    if(parseInt(this.innerHTML) > maxDataVals[colNo]) maxDataVals[colNo] = parseInt(this.innerHTML);
+    
+    //TODO also need to create colCount-D array with all values for each column
+});
+
+
+
 var WIDTH = window.innerWidth; 
 var HEIGHT = window.innerHeight;  
+
 var maxFreq = 6000; var maxVol = 0.02;  
 var initialFreq = 3000; var initialVol = 0.001;  
 // set options for the oscillator  
@@ -19,6 +39,7 @@ oscillator.start(0);
 oscillator.onended = function() {   
     console.log('Your tone has now stopped playing!'); 
 }  
+
 gainNode.gain.value = initialVol;  
 // Mouse pointer coordinates  
 var CurX; var CurY;  
@@ -33,4 +54,5 @@ function updatePage(e) {
     oscillator.frequency.value = (CurX/WIDTH) * maxFreq;     
     gainNode.gain.value = (CurY/HEIGHT) * maxVol;      
 }  
+
 //AUDIFICATION - pitch (direct mapping)
