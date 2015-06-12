@@ -14,7 +14,7 @@
             <h1>Sonification</h1>
             <form action="upload.php" method="post" enctype="multipart/form-data">
             <div class="row">
-                <div class="col-md-4"><h4>Please select csv file</h4></div>
+                <div class="col-md-4"><h4>Please select a csv file <br/> containing numerical data</h4></div>
                 <div class="col-md-4"><h4><input type="file" name="csv" value="" /><h4></div>
             </div>
             <div class="row">
