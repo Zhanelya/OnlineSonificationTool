@@ -8,12 +8,14 @@ oscillator.connect(gainNode);
 gainNode.connect(audioCtx.destination);  
 // create initial theremin frequency and volumn values  
 
-
 var colCount = document.getElementById("count").innerHTML; //number of columns
 var maxDataVals = new Array(colCount);
 for (var i = 0; i < colCount; i++) maxDataVals[i] = Number.MIN_VALUE;
 var minDataVals = new Array(colCount);
 for (var i = 0; i < colCount; i++) minDataVals[i] = Number.MAX_VALUE;
+
+var dataVals = new Array(colCount); //create colCount-D array with all values for each column
+for (i=0;i<3;i++){dataVals[i]=new Array();} //initialise array for each column
 
 $('[class*="value"]').each(function(){
     var classList = this.className.split(/\s+/); //for every table value retrieve classlist
@@ -21,10 +23,12 @@ $('[class*="value"]').each(function(){
     if(parseInt(this.innerHTML) < minDataVals[colNo]) minDataVals[colNo] = parseInt(this.innerHTML);
     if(parseInt(this.innerHTML) > maxDataVals[colNo]) maxDataVals[colNo] = parseInt(this.innerHTML);
     
-    //TODO also need to create colCount-D array with all values for each column
+    dataVals[colNo].push(parseInt(this.innerHTML));
 });
 
-
+console.log(dataVals); 
+console.log(maxDataVals);
+console.log(minDataVals);
 
 var WIDTH = window.innerWidth; 
 var HEIGHT = window.innerHeight;  
@@ -35,7 +39,7 @@ var initialFreq = 3000; var initialVol = 0.001;
 oscillator.type = 'square'; 
 oscillator.frequency.value = initialFreq; // value in hertz 
 oscillator.detune.value = 100; // value in cents 
-oscillator.start(0);  
+//oscillator.start(0);  
 oscillator.onended = function() {   
     console.log('Your tone has now stopped playing!'); 
 }  
