@@ -14,7 +14,7 @@
             <h1>Sonification</h1>
             <form action="upload.php" method="post" enctype="multipart/form-data">
             <div class="row">
-                <div class="col-md-4"><h4>Please select a csv file <br/> containing numerical data</h4></div>
+                <div class="col-md-4"><h4>Please select a csv file <br/> containing numerical data <br/> (top row should contain field names)</h4></div>
                 <div class="col-md-4"><h4><input type="file" name="csv" value="" /><h4></div>
             </div>
             <div class="row">
@@ -44,12 +44,13 @@
                 if(count($_SESSION["csvArr"])>0){
                     echo '<div id="count" style="display:none">'.count($_SESSION["csvArr"][0]).'</div>'; //pass number of columns
                     echo '<div class="container fluid">';
+                    echo'<button id = "audification">Audification</button>';
                     for($i=0; $i<count($_SESSION["csvArr"]);$i++){
                         $row = $_SESSION["csvArr"][$i];
                         echo '<div class="row">';
                         foreach ($row as $colNo => $col){
                             if($i==0){
-                                echo "<div class='col-xs-4 name-".$colNo."'><b>$col</b></div>";
+                                echo "<div class='col-xs-4 name-".$colNo."'><br/><b>$col</b></div>";
                             }else{
                                 echo "<div class='col-xs-4 value-".$colNo."'>$col</div>";
                             }
