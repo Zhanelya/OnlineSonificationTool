@@ -6,12 +6,16 @@ var maxFreq = 2000; // create max frequency
 var minLoudness = 0.1; // create min loudness 
 var maxLoudness = 1.5; // create max loudness 
 var play = true; //flag for play/pause
-var stop = false;
+var timeouts = []; //store timeouts to allow stop button clear scheduled sounds
+var soundDuration = 500;
+
 $(document).ready(function(){
     if(document.getElementById("colCount") &&                  //if file was loaded
       (document.getElementById("colCount").innerHTML > 0)){    //if file contains at least 1 column
          start();
       }
+    //to prevent buttons from highlighting (bootstrap-specific)  
+    $('.btn').click(function() { this.blur() }) 
 });
 
 function start(){
@@ -27,7 +31,10 @@ function start(){
         pm_loudness(data);
     });
     $('#stop').click(function(){
-        stop = true;
+        for (var i = 0; i < timeouts.length; i++) {
+            clearTimeout(timeouts[i]);
+        }
+        timeouts = [];
     });
     $('#pause').click(function(){
         play = false;
@@ -77,12 +84,12 @@ function audification(data){
         for (var k = 0; k < colData.length; k++) {
             (function() {
                 var element = colData[k];
-                    setTimeout(function() { 
+                    timeouts.push(setTimeout(function() { 
                         if(play === true) {
                             freq = element + offset;
-                            playFrequency(freq,1000);
+                            playFrequency(freq,soundDuration);
                         }
-                    }, k * 1000);
+                    }, k * soundDuration));
 
             })(k);
         }
@@ -98,12 +105,12 @@ function pm_frequency(data){
             colData = data.dataVals[i];
             $(colData).each(function(index){
                     var element = this;
-                    setTimeout(function () {
+                    timeouts.push(setTimeout(function () {
                         if(play === true) {
                             freq = closestMidi((element/colMax) * maxFreq + offset);
-                            playFrequency(freq,1000); 
+                            playFrequency(freq,soundDuration); 
                         }
-                    }, index*1000);
+                    }, index*soundDuration));
             });
     } 
 }
@@ -121,14 +128,14 @@ function pm_loudness(data){
             
             $(colData).each(function(index){
                     var element = this;
-                    setTimeout(function () {
+                    timeouts.push(setTimeout(function () {
                         if(play === true) {
                             loudness = (element/colMax) * maxLoudness;
                             freqOffset = minFreq*i;
                             console.log(loudness);
-                            playLoudness(freqOffset,loudness,1000); 
+                            playLoudness(freqOffset,loudness,soundDuration); 
                         }
-                    }, index*1000);
+                    }, index*soundDuration));
             });
     } 
 }

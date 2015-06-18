@@ -47,11 +47,12 @@
                     echo'<button id = "audification" class="btn btn-default"> Audification </button>';
                     echo'<button id = "pm_frequency" class="btn btn-default"> Parameter mapping: frequency </button>';
                     echo'<button id = "pm_loudness" class="btn btn-default"> Parameter mapping: loudness </button>';
-                    echo '<br/>';
-                    echo'<button id = "play" class="btn btn-default"> Play </button>';
-                    echo'<button id = "pause" class="btn btn-default"> Pause </button>';
-                    echo'<button id = "stop" class="btn btn-default"> Stop </button>';
-                     
+                    echo '<br/><br/>';
+                    echo '<div class=btn-group>';
+                    echo'<button id = "play" class="btn btn-default glyphicon glyphicon-play"><br/> Play </button>';
+                    echo'<button id = "pause" class="btn btn-default glyphicon glyphicon-pause"><br/> Pause </button>';
+                    echo'<button id = "stop" class="btn btn-default glyphicon glyphicon-stop"><br/> Stop </button>';
+                     echo '</div>';
                     for($i=0; $i<count($_SESSION["csvArr"]);$i++){
                         $row = $_SESSION["csvArr"][$i];
                         echo '<div class="row">';
