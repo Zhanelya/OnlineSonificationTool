@@ -1,5 +1,5 @@
 <?php
-session_destroy(); //to clear any data left from previous file 
+if(session_status() == PHP_SESSION_ACTIVE) session_destroy(); //to clear any data left from previous file 
 session_start();
 if($_FILES['csv']['tmp_name']){
     $fileName = explode(".",$_FILES['csv']['name']);
