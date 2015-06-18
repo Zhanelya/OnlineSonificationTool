@@ -1,42 +1,49 @@
+// create web audio api context
+var audioCtx = new (window.AudioContext || window.webkitAudioContext)();   
 var base_a4 = 440; // set A4=440Hz
-// create initial frequency and volume values 
-var maxFreq = 2000; 
-var initialVol = 0.00;  
-var defaultVol = 0.01;
-
+var minFreq = 27.5; // create min frequency 
+var maxFreq = 2000; // create max frequency 
+var minLoudness = 0.1; // create min loudness 
+var maxLoudness = 1.5; // create max loudness 
+var play = true; //flag for play/pause
+var stop = false;
 $(document).ready(function(){
-    if(document.getElementById("count") &&                  //if file was loaded
-      (document.getElementById("count").innerHTML > 0)){    //if file contains at least 1 column
+    if(document.getElementById("colCount") &&                  //if file was loaded
+      (document.getElementById("colCount").innerHTML > 0)){    //if file contains at least 1 column
          start();
       }
 });
 
 function start(){
     var data = getData();
-    console.log(data); 
-    
-    // create web audio api context 
-    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();  
-    // create oscillator & gain node 
-    var oscillator = audioCtx.createOscillator(); 
-    var gainNode = audioCtx.createGain();  
-    // connect oscillator & gain node to speakers  
-    oscillator.connect(gainNode); 
-    gainNode.connect(audioCtx.destination); 
-    
+     
     $("#audification").click(function(){
-        audification(oscillator,gainNode,data);
+        audification(data);
     });
-    
+    $("#pm_frequency").click(function(){
+        pm_frequency(data);
+    });
+    $("#pm_loudness").click(function(){
+        pm_loudness(data);
+    });
+    $('#stop').click(function(){
+        stop = true;
+    });
+    $('#pause').click(function(){
+        play = false;
+    });
+    $('#play').click(function(){
+        play = true;
+    });
 }
 
 function getData(){
     data = {}; //initialise return value
     
-    var colCount = document.getElementById("count").innerHTML; //get number of columns
+    var colCount = document.getElementById("colCount").innerHTML; //get number of columns
    
     var dataVals = new Array(colCount);     //colCount-D array with all values for each column
-    for (i=0;i<3;i++){dataVals[i]=new Array();} //initialise array for each column
+    for (i=0;i<colCount;i++){dataVals[i]=new Array();} //initialise array for each column
     
     var maxDataVals = new Array(colCount);  //array for max values in each column
     for (var i = 0; i < colCount; i++) maxDataVals[i] = Number.MIN_VALUE;
@@ -61,77 +68,69 @@ function getData(){
 }
 
 /* audification (direct mapping of data to pitch/frequency) */
-function audification(oscillator,gainNode,data){
-    // set options for the oscillator  
-    // sine wave sounds as the least obtrusive, 
-    // may extend with user choice of 
-    // square/sine/etc. wave types
-    oscillator.type = 'sine';  
-    oscillator.frequency.value = base_a4; // value in hertz 
-    oscillator.detune.value = 200; // value in cents 
-    try{oscillator.start(0);
-    }catch(err){}
-      
-    gainNode.gain.value = initialVol;
-    
+function audification(data){
+    play = true;
     //offset if the value is below or above reasonable hearable range
-    offset = calculateOffset(data, maxFreq);
-    
+    offset = calculateOffsetAudification(data);
     for(i = 0; i < data.colCount; i++){
-            //sleep(200);
-            colMax = data.maxDataVals[i];
-            colMin = data.minDataVals[i];
-            colData = data.dataVals[i];
-           
-            $(colData).each(function(index){
-                sound = closestMidi((this/colMax) * maxFreq + offset);
-                oscillator.frequency.value = sound; 
-                gainNode.gain.value = defaultVol;
-              //  sleep(100);
-            });
-    }
-    
-}
+        colData = data.dataVals[i];
+        for (var k = 0; k < colData.length; k++) {
+            (function() {
+                var element = colData[k];
+                    setTimeout(function() { 
+                        if(play === true) {
+                            freq = element + offset;
+                            playFrequency(freq,1000);
+                        }
+                    }, k * 1000);
 
+            })(k);
+        }
+    }
+}
 /* parameter mapping - loudness */
-function pm_frequency(oscillator,gainNode,data){
-    
+function pm_frequency(data){
+    play = true;
+    //offset if the value is below or above reasonable hearable range
+    offset = calculateOffsetPMFrequency(data);
+    for(i = 0; i < data.colCount; i++){
+            colMax = data.maxDataVals[i];
+            colData = data.dataVals[i];
+            $(colData).each(function(index){
+                    var element = this;
+                    setTimeout(function () {
+                        if(play === true) {
+                            freq = closestMidi((element/colMax) * maxFreq + offset);
+                            playFrequency(freq,1000); 
+                        }
+                    }, index*1000);
+            });
+    } 
 }
 
 /* parameter mapping - frequency */
-function pm_loudness(oscillator,gainNode,data){
-    
-    // create initial theremin frequency and volumn values 
-    var WIDTH = window.innerWidth; 
-    var HEIGHT = window.innerHeight;  
-
-    var maxFreq = 6000; var maxVol = 0.02;  
-    // set options for the oscillator  
-    oscillator.type = 'square'; 
-    oscillator.frequency.value = base_a4; // value in hertz 
-    oscillator.detune.value = 100; // value in cents 
-    
-    
-    oscillator.start(0);  
-    oscillator.onended = function() {   
-        console.log('Your tone has now stopped playing!'); 
-    }  
-
-    gainNode.gain.value = initialVol;  
-    // Mouse pointer coordinates  
-    var CurX; var CurY;  
-    // Get new mouse pointer coordinates when mouse is moved 
-    // then set new gain and pitch values  
-    
-    document.onmousemove = updatePage; 
-
-    function updatePage(e) {     
-        KeyFlag = false;      
-        CurX = (window.Event) ? e.pageX : event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);     
-        CurY = (window.Event) ? e.pageY : event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);          
-        oscillator.frequency.value = (CurX/WIDTH) * maxFreq;     
-        gainNode.gain.value = (CurY/HEIGHT) * maxVol;      
-    }  
+function pm_loudness(data){
+    play = true;
+    //offset if the value is below or above reasonable hearable range
+    //offset = calculateOffset(data, maxFreq);
+    for(i = 0; i < data.colCount; i++){
+       
+            colMax = data.maxDataVals[i];
+            colMin = data.minDataVals[i];
+            colData = data.dataVals[i];
+            
+            $(colData).each(function(index){
+                    var element = this;
+                    setTimeout(function () {
+                        if(play === true) {
+                            loudness = (element/colMax) * maxLoudness;
+                            freqOffset = minFreq*i;
+                            console.log(loudness);
+                            playLoudness(freqOffset,loudness,1000); 
+                        }
+                    }, index*1000);
+            });
+    } 
 }
 
 function closestMidi(freq){
@@ -148,7 +147,18 @@ function midiToFreq(midi){
     return freq;
 }
 
-function calculateOffset(data, maxFreq){
+function calculateOffsetAudification(data){
+    possibleMin = Number.MAX_VALUE;
+    for (i = 0; i < data.colCount; i++){
+        colMin = data.minDataVals[i];
+        if(colMin < possibleMin) possibleMin = colMin;
+    }
+    //represent data minimum as A4 frequency
+    offset = Math.abs(base_a4 - possibleMin); 
+    return offset;
+}
+
+function calculateOffsetPMFrequency(data){
     possibleMin = Number.MAX_VALUE;
     for (i = 0; i < data.colCount; i++){
         colMin = data.minDataVals[i];
@@ -156,12 +166,53 @@ function calculateOffset(data, maxFreq){
         possibleVal = (colMin/colMax)*maxFreq;
         if(possibleVal < possibleMin) possibleMin = possibleVal;
     }
-    //represent data minimum as 27.5Hz i.e. A0
-    offset = Math.abs(27.5 - possibleMin); 
+    //represent data minimum as  minimum frequency (Hz) i.e. A0
+    offset = Math.abs(minFreq - possibleMin); 
     return offset;
 }
 
-function sleep(ms) {
-    var unixtime_ms = new Date().getTime();
-    while(new Date().getTime() < unixtime_ms + ms) {}
+function playFrequency(freq, duration) { 
+    var attack = 5,
+        gain = audioCtx.createGain(), 
+        osc = audioCtx.createOscillator(); 
+
+    gain.connect(audioCtx.destination); 
+    gain.gain.setValueAtTime(0, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + attack / 1000);
+    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration / 1000);
+
+    osc.frequency.value = freq;
+    osc.type = "sine";
+    osc.detune = 100;
+    osc.connect(gain); 
+    osc.start(0);
+
+    setTimeout(function() { 
+        osc.stop(0);
+        osc.disconnect(gain);
+        gain.disconnect(audioCtx.destination);
+    }, duration);
+}
+
+function playLoudness(freqOffset,loudness, duration) { 
+    var attack = 5,
+        gain = audioCtx.createGain(), 
+        osc = audioCtx.createOscillator(); 
+
+    gain.connect(audioCtx.destination); 
+    gain.gain.setValueAtTime(0, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(loudness, audioCtx.currentTime + attack / 1000);
+    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration / 1000);
+
+    osc.frequency.value = base_a4 + freqOffset;
+    osc.type = "sine";
+    osc.detune = 100;
+    osc.connect(gain); 
+    osc.start(0);
+
+    setTimeout(function() { 
+        osc.stop(0);
+        osc.disconnect(gain);
+        gain.disconnect(audioCtx.destination);
+    }, duration)
 }

@@ -42,9 +42,16 @@
         <?php 
             if(isset($_SESSION['csvArr']) && !empty($_SESSION['csvArr'])) {
                 if(count($_SESSION["csvArr"])>0){
-                    echo '<div id="count" style="display:none">'.count($_SESSION["csvArr"][0]).'</div>'; //pass number of columns
+                    echo '<div id="colCount" style="display:none">'.$_SESSION["csvColsCnt"].'</div>'; //pass number of columns
                     echo '<div class="container fluid">';
-                    echo'<button id = "audification">Audification</button>';
+                    echo'<button id = "audification" class="btn btn-default"> Audification </button>';
+                    echo'<button id = "pm_frequency" class="btn btn-default"> Parameter mapping: frequency </button>';
+                    echo'<button id = "pm_loudness" class="btn btn-default"> Parameter mapping: loudness </button>';
+                    echo '<br/>';
+                    echo'<button id = "play" class="btn btn-default"> Play </button>';
+                    echo'<button id = "pause" class="btn btn-default"> Pause </button>';
+                    echo'<button id = "stop" class="btn btn-default"> Stop </button>';
+                     
                     for($i=0; $i<count($_SESSION["csvArr"]);$i++){
                         $row = $_SESSION["csvArr"][$i];
                         echo '<div class="row">';
