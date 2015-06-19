@@ -8,7 +8,7 @@ var soundLoudness = 0.3; //default single sound loudness
 var soundDuration = 500; //default single sound duration
 var numericData; //flag to check if all data is numeric
 var play = true; //flag for play/pause
-var reverse = false;
+var reverse = false; //flag for reversed play
 var scheduled = []; //store sounds scheduled to play (to enable pause/play)
 var timeouts = []; //store timeouts (to allow stop button clear scheduled sounds)
 var repeat = 0; //flag for looping on/off
@@ -115,9 +115,7 @@ function start(){
         }
     });
 }
-function clearErrors(){
-    console.log('hi');
-}
+
 /* Get data from DOM elements and store it in a multi-D array */
 function getData(){
     data = {}; //initialise return value
