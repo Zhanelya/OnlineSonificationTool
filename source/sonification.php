@@ -56,7 +56,9 @@
                         echo '<div class=btn-group> 
                                 <button id = "play" class="btn btn-default glyphicon glyphicon-play"><br/> Play </button>
                                 <button id = "pause" class="btn btn-default glyphicon glyphicon-pause"><br/> Pause </button>
-                                <button id = "stop" class="btn btn-default glyphicon glyphicon-stop"><br/> Stop </button>';
+                                <button id = "stop" class="btn btn-default glyphicon glyphicon-stop"><br/> Stop </button>
+                                <button id = "fwd" class="btn btn-default glyphicon glyphicon-forward"><br/> Forward </button>
+                                ';
                         echo '</div>';
                         echo '<div class="row" id = "errContainer"></div>';
                         for($i=0; $i<count($_SESSION["csvArr"]);$i++){

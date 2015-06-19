@@ -20,7 +20,7 @@ $(document).ready(function(){
     //to prevent buttons from highlighting (bootstrap-specific)  
     $('.btn').click(function() { this.blur(); });  
     //to fadeout errors once the user has seen them
-    document.onmousemove = function (e) {
+    document.onmousemove = function () {
         $('.err').fadeOut(3500);
     };  
 });
@@ -33,12 +33,15 @@ function start(){
     for (i=0;i<data.colCount;i++){scheduled.push(new Array());} 
     
     $("#audification").click(function(){
+        soundDuration = 500;
         audification(data);
     });
     $("#pm_frequency").click(function(){
+        soundDuration = 500;
         pm_frequency(data);
     });
     $("#pm_loudness").click(function(){
+        soundDuration = 500;
         pm_loudness(data);
     });
     $('#stop').click(function(){
@@ -58,6 +61,16 @@ function start(){
         play = false;
     });
     $('#play').click(function(){
+        soundDuration = 500;
+        for (var i = 0; i < timeouts.length; i++) {
+            clearTimeout(timeouts[i]);
+        }
+        timeouts = [];
+        play = true;
+        resumeSoundPattern();
+    });
+    $('#fwd').click(function(){
+        soundDuration = 250;
         for (var i = 0; i < timeouts.length; i++) {
             clearTimeout(timeouts[i]);
         }
