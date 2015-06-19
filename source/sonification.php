@@ -43,6 +43,8 @@
             if(isset($_SESSION['csvArr']) && !empty($_SESSION['csvArr'])) {
                 if(count($_SESSION["csvArr"])>0){
                     echo '<div id="colCount" style="display:none">'.$_SESSION["csvColsCnt"].'</div>'; //pass number of columns
+                    echo '<div id="rowCount" style="display:none">'.$_SESSION["csvRowsCnt"].'</div>'; //pass number of columns
+                    
                     echo '<div class="container fluid">';
                     echo'<button id = "audification" class="btn btn-default"> Audification </button>';
                     echo'<button id = "pm_frequency" class="btn btn-default"> Parameter mapping: frequency </button>';
