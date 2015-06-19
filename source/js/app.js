@@ -1,7 +1,6 @@
 // create web audio api context
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();   
-var base_a4 = 440; // set A4=440Hz
-var minFreq = 27.5; // set min frequency 
+var base_a4 = 440; // set A4=440Hz (min frequency)
 var maxFreq = 2000; // set max frequency 
 var minLoudness = 0.1; // set min loudness 
 var maxLoudness = 1.0; // set max loudness 
@@ -9,9 +8,11 @@ var soundLoudness = 0.3; //default single sound loudness
 var soundDuration = 500; //default single sound duration
 var numericData; //flag to check if all data is numeric
 var play = true; //flag for play/pause
+var reverse = false;
 var scheduled = []; //store sounds scheduled to play (to enable pause/play)
 var timeouts = []; //store timeouts (to allow stop button clear scheduled sounds)
 var repeat = 0; //flag for looping on/off
+
 $(document).ready(function(){
     if(document.getElementById("colCount") &&                  //if file was loaded
       (document.getElementById("colCount").innerHTML > 0)){    //if file contains at least 1 column
@@ -34,29 +35,35 @@ function start(){
     
     $("#audification").click(function(){
         soundDuration = 500;
+        var reverse = false;
         audification();
     });
     $("#pm_frequency").click(function(){
         soundDuration = 500;
+        var reverse = false;
         pm_frequency();
     });
     $("#pm_loudness").click(function(){
         soundDuration = 500;
+        var reverse = false;
         pm_loudness();
     });
     $('#play').click(function(){
+        reverse = false;
+        play = true;
         soundDuration = 500;
         for (var i = 0; i < timeouts.length; i++) {
             clearTimeout(timeouts[i]);
         }
         timeouts = [];
-        play = true;
         resumeSoundPattern();
     });
     $('#pause').click(function(){
+        reverse = false;
         play = false;
     });
     $('#stop').click(function(){
+        reverse = false;
         for (var i = 0; i < timeouts.length; i++) {
             clearTimeout(timeouts[i]);
         }
@@ -70,10 +77,24 @@ function start(){
         }
     });
     $('#reverse').click(function(){
-        //TODO reverse
+        reverse = true;
+        play = true;
+        soundDuration = 500;
+        for (var i = 0; i < timeouts.length; i++) {
+            clearTimeout(timeouts[i]);
+        }
+        timeouts = [];
+        resumeSoundPattern();
     });
     $('#bwd').click(function(){
-        //TODO backward
+        reverse = true;
+        play = true;
+        soundDuration = 250;
+        for (var i = 0; i < timeouts.length; i++) {
+            clearTimeout(timeouts[i]);
+        }
+        timeouts = [];
+        resumeSoundPattern();
     });
     $('#fwd').click(function(){
         soundDuration = 250;
@@ -183,10 +204,10 @@ function calculateOffsetPMFrequency(){
         if(possibleVal < possibleMin) possibleMin = possibleVal;
     }
     //represent data minimum as  minimum frequency (Hz) i.e. A0
-    if (possibleMin <= minFreq){
-        offset = minFreq - possibleMin;
+    if (possibleMin <= base_a4){
+        offset = base_a4 - possibleMin;
     }else{
-        offset = -(possibleMin - minFreq);
+        offset = -(possibleMin - base_a4);
     } 
     return offset;
 }
@@ -275,7 +296,11 @@ function resumeSoundPattern(){
         colData = scheduled[i];
         for (var k = 0; k < colData.length; k++) {
             (function() {
-                var element = colData[k];
+                if(reverse){
+                    var element = colData[colData.length-1-k];
+                }else{
+                    var element = colData[k];
+                }
                 var index = i;
                 var val = element;
                     timeouts.push(setTimeout(function() { 
@@ -288,8 +313,11 @@ function resumeSoundPattern(){
                                 freq = val;
                                 playSound(freq,soundLoudness,soundDuration);
                             }
-                            
-                            scheduled[index].shift();
+                            if(reverse){
+                                scheduled[index].pop();
+                            }else{
+                                scheduled[index].shift();
+                            }
                         }
                     }, k * soundDuration));
             })(k);
