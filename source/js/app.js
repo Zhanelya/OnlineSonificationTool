@@ -44,6 +44,18 @@ function start(){
         soundDuration = 500;
         pm_loudness(data);
     });
+    $('#play').click(function(){
+        soundDuration = 500;
+        for (var i = 0; i < timeouts.length; i++) {
+            clearTimeout(timeouts[i]);
+        }
+        timeouts = [];
+        play = true;
+        resumeSoundPattern();
+    });
+    $('#pause').click(function(){
+        play = false;
+    });
     $('#stop').click(function(){
         for (var i = 0; i < timeouts.length; i++) {
             clearTimeout(timeouts[i]);
@@ -57,17 +69,11 @@ function start(){
             }
         }
     });
-    $('#pause').click(function(){
-        play = false;
+    $('#reverse').click(function(){
+        //TODO reverse
     });
-    $('#play').click(function(){
-        soundDuration = 500;
-        for (var i = 0; i < timeouts.length; i++) {
-            clearTimeout(timeouts[i]);
-        }
-        timeouts = [];
-        play = true;
-        resumeSoundPattern();
+    $('#bwd').click(function(){
+        //TODO backward
     });
     $('#fwd').click(function(){
         soundDuration = 250;

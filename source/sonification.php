@@ -54,10 +54,12 @@
                               <button id = "pm_loudness" class="btn btn-default"> Parameter mapping: loudness </button><br/><br/>';
                         echo '<p>*Please don\'t leave the tab while the sound is playing, as this will interrupt the sound flow</p>';
                         echo '<div class=btn-group> 
-                                <button id = "play" class="btn btn-default glyphicon glyphicon-play"><br/> Play </button>
-                                <button id = "pause" class="btn btn-default glyphicon glyphicon-pause"><br/> Pause </button>
-                                <button id = "stop" class="btn btn-default glyphicon glyphicon-stop"><br/> Stop </button>
-                                <button id = "fwd" class="btn btn-default glyphicon glyphicon-forward"><br/> Forward </button>
+                                <button class = "btn btn-default" id = "play"><div class="glyphicon glyphicon-play"></div><br/> Play </button>
+                                <button class = "btn btn-default" id = "pause"><div class="glyphicon glyphicon-pause"></div><br/> Pause </button>
+                                <button class = "btn btn-default" id = "stop"><div class="glyphicon glyphicon-stop"></div><br/> Stop </button>
+                                <button class = "btn btn-default" id = "reverse"><div class= "glyphicon glyphicon-play icon-flipped"></div><br/> Reverse </button>
+                                <button class = "btn btn-default" id = "bwd"><div class="glyphicon glyphicon-backward"></div><br/> Backward </button>
+                                <button class = "btn btn-default" id = "fwd"><div class="glyphicon glyphicon-forward"></div><br/> Forward </button>
                                 ';
                         echo '</div>';
                         echo '<div class="row" id = "errContainer"></div>';
