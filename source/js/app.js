@@ -11,7 +11,7 @@ var numericData; //flag to check if all data is numeric
 var play = true; //flag for play/pause
 var scheduled = []; //store sounds scheduled to play (to enable pause/play)
 var timeouts = []; //store timeouts (to allow stop button clear scheduled sounds)
-
+var repeat = 0; //flag for looping on/off
 $(document).ready(function(){
     if(document.getElementById("colCount") &&                  //if file was loaded
       (document.getElementById("colCount").innerHTML > 0)){    //if file contains at least 1 column
@@ -34,15 +34,15 @@ function start(){
     
     $("#audification").click(function(){
         soundDuration = 500;
-        audification(data);
+        audification();
     });
     $("#pm_frequency").click(function(){
         soundDuration = 500;
-        pm_frequency(data);
+        pm_frequency();
     });
     $("#pm_loudness").click(function(){
         soundDuration = 500;
-        pm_loudness(data);
+        pm_loudness();
     });
     $('#play').click(function(){
         soundDuration = 500;
@@ -84,8 +84,14 @@ function start(){
         play = true;
         resumeSoundPattern();
     });
-    $('#bwd').click(function(){
-        //TODO repeat
+    $('#repeat').click(function(){
+        if(repeat === 0){
+            repeat = 1;
+            $(this).addClass('active');
+        }else{
+            repeat = 0;
+            $(this).removeClass('active');
+        }
     });
 }
 function clearErrors(){
@@ -125,25 +131,25 @@ function getData(){
 }
 
 /* Audification (direct mapping of data to pitch/frequency) */
-function audification(data){
+function audification(){
     play = true;
     //offset if the value is below or above reasonable hearable range
-    offset = calculateOffsetAudification(data);
+    offset = calculateOffsetAudification();
     scheduled[data.colCount]='audification';
     playSoundPattern(offset);
 }
 
 /* Parameter mapping - frequency */
-function pm_frequency(data){
+function pm_frequency(){
     play = true;
     scheduled[data.colCount]='pm_frequency';
     //offset if the value is below or above reasonable hearable range
-    offset = calculateOffsetPMFrequency(data);
+    offset = calculateOffsetPMFrequency();
     playSoundPattern(offset);
 }
 
 /* Parameter mapping - loudness */
-function pm_loudness(data){
+function pm_loudness(){
     play = true;
     scheduled[data.colCount]='pm_loudness';
     playSoundPattern();
@@ -151,7 +157,7 @@ function pm_loudness(data){
 
 /* Calculate the offset needed for audification in order to 
  * fit the sound pattern into reasonable audible range */
-function calculateOffsetAudification(data){
+function calculateOffsetAudification(){
     possibleMin = Number.MAX_VALUE;
     for (i = 0; i < data.colCount; i++){
         colMin = data.minDataVals[i];
@@ -168,7 +174,7 @@ function calculateOffsetAudification(data){
 
 /* Calculate the offset needed for parameter mapping with a use of frequency 
  * in order to fit the sound pattern into reasonable audible range */
-function calculateOffsetPMFrequency(data){
+function calculateOffsetPMFrequency(){
     possibleMin = Number.MAX_VALUE;
     for (i = 0; i < data.colCount; i++){
         colMin = data.minDataVals[i];
@@ -241,7 +247,7 @@ function playSoundPattern(offset){
         } 
     }else{
         $('#errContainer').append('<div class="col-md-4 err">Error. Please upload a file with numerical data</div>');
-    }    
+    }
 }
 
 /* Find closest frequency corresponding to a MIDI note*/

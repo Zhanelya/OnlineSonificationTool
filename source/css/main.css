@@ -19,7 +19,8 @@ nav{
 }
 /* error message */
 .err{
-    color:red;
+    color : firebrick;
+    text-shadow: 2px 2px white;
 }
 /* to flip bootstrap icons horizontally(used for reverse btn) */
 .icon-flipped {
