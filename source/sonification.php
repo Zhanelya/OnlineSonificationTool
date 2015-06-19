@@ -53,15 +53,18 @@
                               <button id = "pm_frequency" class="btn btn-default"> Parameter mapping: frequency </button>
                               <button id = "pm_loudness" class="btn btn-default"> Parameter mapping: loudness </button><br/><br/>';
                         echo '<p>*Please don\'t leave the tab while the sound is playing, as this will interrupt the sound flow</p>';
-                        echo '<div class=btn-group> 
-                                <button class = "btn btn-default" id = "play"><div class="glyphicon glyphicon-play"></div><br/> Play </button>
-                                <button class = "btn btn-default" id = "pause"><div class="glyphicon glyphicon-pause"></div><br/> Pause </button>
-                                <button class = "btn btn-default" id = "stop"><div class="glyphicon glyphicon-stop"></div><br/> Stop </button>
-                                <button class = "btn btn-default" id = "reverse"><div class= "glyphicon glyphicon-play icon-flipped"></div><br/> Reverse </button>
-                                <button class = "btn btn-default" id = "bwd"><div class="glyphicon glyphicon-backward"></div><br/> Backward </button>
-                                <button class = "btn btn-default" id = "fwd"><div class="glyphicon glyphicon-forward"></div><br/> Forward </button>
-                                ';
-                        echo '</div>';
+                        echo '<div class="btn-toolbar" role="toolbar">';
+                            echo '<div class=btn-group> 
+                                    <button class = "btn btn-default" id = "play"><div class="glyphicon glyphicon-play"></div><br/> Play </button>
+                                    <button class = "btn btn-default" id = "pause"><div class="glyphicon glyphicon-pause"></div><br/> Pause </button>
+                                    <button class = "btn btn-default" id = "stop"><div class="glyphicon glyphicon-stop"></div><br/> Stop </button>
+                                    <button class = "btn btn-default" id = "reverse"><div class= "glyphicon glyphicon-play icon-flipped"></div><br/> Reverse </button>
+                                    <button class = "btn btn-default" id = "bwd"><div class="glyphicon glyphicon-backward"></div><br/> Backward </button>
+                                    <button class = "btn btn-default" id = "fwd"><div class="glyphicon glyphicon-forward"></div><br/> Forward </button>
+                                    ';
+                            echo '</div>';
+                        echo '<button class = "btn btn-default" id = "repeat"><div class="glyphicon glyphicon-repeat"></div> <br/>Repeat</button>';
+                        echo '</div>';    
                         echo '<div class="row" id = "errContainer"></div>';
                         for($i=0; $i<count($_SESSION["csvArr"]);$i++){
                             $row = $_SESSION["csvArr"][$i];

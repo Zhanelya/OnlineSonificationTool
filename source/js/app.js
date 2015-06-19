@@ -84,6 +84,9 @@ function start(){
         play = true;
         resumeSoundPattern();
     });
+    $('#bwd').click(function(){
+        //TODO repeat
+    });
 }
 function clearErrors(){
     console.log('hi');
@@ -130,7 +133,7 @@ function audification(data){
     playSoundPattern(offset);
 }
 
-/* Parameter mapping - loudness */
+/* Parameter mapping - frequency */
 function pm_frequency(data){
     play = true;
     scheduled[data.colCount]='pm_frequency';
@@ -139,11 +142,11 @@ function pm_frequency(data){
     playSoundPattern(offset);
 }
 
-/* Parameter mapping - frequency */
+/* Parameter mapping - loudness */
 function pm_loudness(data){
     play = true;
     scheduled[data.colCount]='pm_loudness';
-    playSoundPattern(offset);
+    playSoundPattern();
 }
 
 /* Calculate the offset needed for audification in order to 
