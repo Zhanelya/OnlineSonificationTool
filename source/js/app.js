@@ -13,6 +13,7 @@ var reverse = false; //flag for reversed play
 var scheduled = []; //store sounds scheduled to play (to enable pause/play)
 var timeouts = []; //store timeouts (to allow stop button clear scheduled sounds)
 var repeat = 0; //flag for looping on/off
+var data; //data array
 
 $(document).ready(function(){
     if(document.getElementById("colCount") &&                  //if file was loaded
@@ -29,24 +30,42 @@ $(document).ready(function(){
     
 /* Initialise script */
 function start(){
-    var data = getData();
-    
-    scheduled = new Array();
-    for (i=0;i<data.colCount;i++){scheduled.push(new Array());} 
+    data = getData();
     
     $("#audification").click(function(){
+        $(this).addClass('active');
+        $('#pm_frequency').removeClass('active');
+        $('#pm_loudness').removeClass('active');
+        
         soundDuration = 500;
         reverse = false;
+        clearTimeoutsQueue();
+        initScheduledSounds();
+        
         audification();
     });
     $("#pm_frequency").click(function(){
+        $(this).addClass('active');
+        $('#audification').removeClass('active');
+        $('#pm_loudness').removeClass('active');
+        
         soundDuration = 500;
         reverse = false;
+        clearTimeoutsQueue();
+        initScheduledSounds();
+        
         pm_frequency();
     });
     $("#pm_loudness").click(function(){
+        $(this).addClass('active');
+        $('#pm_frequency').removeClass('active');
+        $('#audification').removeClass('active');
+        
         soundDuration = 500;
         reverse = false;
+        clearTimeoutsQueue();
+        initScheduledSounds();
+        
         pm_loudness();
     });
     $('#play').click(function(){
@@ -59,14 +78,11 @@ function start(){
         play = false;
     });
     $('#stop').click(function(){
+        $('#sudification').removeClass('active');
+        $('#pm_frequency').removeClass('active');
+        $('#pm_loudness').removeClass('active');
         clearTimeoutsQueue();
-        for (var i = 0; i < scheduled.length; i++) {
-            if(i<(scheduled.length-1)){
-               scheduled[i] = []; 
-            }else{
-               scheduled[i] = ''; //last element of scheduled stored string value of sonification type
-            }
-        }
+        initScheduledSounds();
     });
     $('#reverse').click(function(){
         reverse = true;
@@ -95,6 +111,20 @@ function start(){
             $(this).removeClass('active');
         }
     });
+}
+
+/* Clear js events queue, which is triggering sounds */
+function clearTimeoutsQueue(){
+    for (var i = 0; i < timeouts.length; i++) {
+        clearTimeout(timeouts[i]);
+    }
+    timeouts = [];
+}
+
+/* Initialise/clear the array of schediled sounds */
+function initScheduledSounds(){
+    scheduled = new Array();
+    for (i=0;i<data.colCount;i++){scheduled.push(new Array());} 
 }
 
 /* Get data from DOM elements and store it in a multi-D array */
@@ -318,14 +348,6 @@ function resumeSoundPattern(){
             })(k);
         }
     }
-}
-
-/* Clear js events queue, which is triggering sounds */
-function clearTimeoutsQueue(){
-    for (var i = 0; i < timeouts.length; i++) {
-        clearTimeout(timeouts[i]);
-    }
-    timeouts = [];
 }
 
 /* Repeat if repeat is on */
