@@ -35,39 +35,30 @@ function start(){
     
     $("#audification").click(function(){
         soundDuration = 500;
-        var reverse = false;
+        reverse = false;
         audification();
     });
     $("#pm_frequency").click(function(){
         soundDuration = 500;
-        var reverse = false;
+        reverse = false;
         pm_frequency();
     });
     $("#pm_loudness").click(function(){
         soundDuration = 500;
-        var reverse = false;
+        reverse = false;
         pm_loudness();
     });
     $('#play').click(function(){
         reverse = false;
         play = true;
         soundDuration = 500;
-        for (var i = 0; i < timeouts.length; i++) {
-            clearTimeout(timeouts[i]);
-        }
-        timeouts = [];
         resumeSoundPattern();
     });
     $('#pause').click(function(){
-        reverse = false;
         play = false;
     });
     $('#stop').click(function(){
-        reverse = false;
-        for (var i = 0; i < timeouts.length; i++) {
-            clearTimeout(timeouts[i]);
-        }
-        timeouts = [];
+        clearTimeoutsQueue();
         for (var i = 0; i < scheduled.length; i++) {
             if(i<(scheduled.length-1)){
                scheduled[i] = []; 
@@ -80,29 +71,18 @@ function start(){
         reverse = true;
         play = true;
         soundDuration = 500;
-        for (var i = 0; i < timeouts.length; i++) {
-            clearTimeout(timeouts[i]);
-        }
-        timeouts = [];
         resumeSoundPattern();
     });
     $('#bwd').click(function(){
         reverse = true;
         play = true;
         soundDuration = 250;
-        for (var i = 0; i < timeouts.length; i++) {
-            clearTimeout(timeouts[i]);
-        }
-        timeouts = [];
         resumeSoundPattern();
     });
     $('#fwd').click(function(){
-        soundDuration = 250;
-        for (var i = 0; i < timeouts.length; i++) {
-            clearTimeout(timeouts[i]);
-        }
-        timeouts = [];
+        reverse = false;
         play = true;
+        soundDuration = 250;
         resumeSoundPattern();
     });
     $('#repeat').click(function(){
@@ -253,11 +233,25 @@ function playSoundPattern(offset){
                             if(play === true) {
                                 if(scheduled[data.colCount]==='pm_frequency'||
                                     scheduled[data.colCount]==='audification'){
-                                    playSound(freq,soundLoudness,soundDuration);
+                                    if(reverse){
+                                        //if reverse is on, play from last to first
+                                        freq = scheduled[index][scheduled[index].length-1];
+                                        playSound(freq,soundLoudness,soundDuration);
+                                    }else{
+                                        //if reverse is off, play from first to last
+                                        playSound(freq,soundLoudness,soundDuration);
+                                    }
                                 }else if(scheduled[data.colCount]==='pm_loudness'){
                                     playSound(freqOffset,loudness,soundDuration); 
-                                }    
-                                scheduled[index].shift();  //remove played sounds from schedule
+                                }  
+                                //remove played sounds from schedule
+                                if(reverse){
+                                    scheduled[index].pop();
+                                }else{
+                                    scheduled[index].shift();
+                                }
+                                //scheduled[index].shift();
+                                if(repeat){loop(index);}
                             }
                         }, k * soundDuration));
 
@@ -288,6 +282,7 @@ function midiToFreq(midi){
 
 /* Resume playing sound after pause/play were pressed */
 function resumeSoundPattern(){
+    clearTimeoutsQueue(); //clear js events queue to eliminate sound overlaps
     //depending on the sonification type, use different replays of scheduled sounds
     play = true;
     for(i = 0; i < data.colCount; i++){
@@ -316,10 +311,31 @@ function resumeSoundPattern(){
                             }else{
                                 scheduled[index].shift();
                             }
+                            if(repeat){loop(index);}
                         }
                     }, k * soundDuration));
             })(k);
         }
+    }
+}
+
+/* Clear js events queue, which is triggering sounds */
+function clearTimeoutsQueue(){
+    for (var i = 0; i < timeouts.length; i++) {
+        clearTimeout(timeouts[i]);
+    }
+    timeouts = [];
+}
+
+/* Repeat if repeat is on */
+function loop(index){
+    if(scheduled[index].length === 0){ //if finished pattern (no more scheduled sounds)
+        setTimeout(function(){
+            //call a sonification function (audification/pm_frequency/pm_loudness)
+            try{
+                eval(scheduled[scheduled.length - 1]+"()"); 
+            }catch(err){}
+        }, soundDuration);
     }
 }
 
@@ -352,15 +368,3 @@ function playSound(freq, loudness, duration){
         gain.disconnect(audioCtx.destination);
     }, duration);
 }
-
-    
-    
-
-
-
-
-
-
-
-
-
