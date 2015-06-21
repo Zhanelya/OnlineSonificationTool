@@ -1,3 +1,4 @@
+/* Zhanelya Subebayeva */
 // create web audio api context
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();   
 var base_a4 = 440; // set A4=440Hz (min frequency)

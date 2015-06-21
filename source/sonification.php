@@ -1,7 +1,9 @@
 <?php 
     session_start();
+    /* Zhanelya Subebayeva */
     require_once 'header.php';
 ?>
+
     <nav class="navbar navbar-inverse">
            <ul class="nav navbar-nav">
                <li><a href="index.php"><h4>Home</h4></a></li>

@@ -1,4 +1,7 @@
-<?php require_once 'header.php';?>
+<?php 
+    /* Zhanelya Subebayeva */
+    require_once 'header.php'
+;?>
     <nav class="navbar navbar-inverse">
            <ul class="nav navbar-nav">
                <li class="active"><a href="index.php"><h4>Home</h4></a></li>
