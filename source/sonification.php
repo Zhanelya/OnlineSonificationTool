@@ -51,9 +51,9 @@
                     echo '<div id="colCount" style="display:none">'.$_SESSION["csvColsCnt"].'</div>
                           <div id="rowCount" style="display:none">'.$_SESSION["csvRowsCnt"].'</div>'; 
                     echo '<div class="container fluid">';
-                        echo '<button id = "audification" class="btn btn-default"> Audification </button>
-                              <button id = "pm_frequency" class="btn btn-default"> Parameter mapping: frequency </button>
-                              <button id = "pm_loudness" class="btn btn-default"> Parameter mapping: loudness </button><br/><br/>';
+                        echo '<button id = "audification" class="btn btn-default sonification"> Audification </button>
+                              <button id = "pm_frequency" class="btn btn-default sonification"> Parameter mapping: frequency </button>
+                              <button id = "pm_loudness" class="btn btn-default sonification"> Parameter mapping: loudness </button><br/><br/>';
                         echo '<p>*Please don\'t leave the tab while the sound is playing, as this will interrupt the sound flow</p>';
                         echo '<div class="btn-toolbar" role="toolbar">';
                             echo '<div class=btn-group> 

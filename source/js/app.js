@@ -33,9 +33,8 @@ function start(){
     data = getData();
     
     $("#audification").click(function(){
+        $('.sonification').removeClass('active');
         $(this).addClass('active');
-        $('#pm_frequency').removeClass('active');
-        $('#pm_loudness').removeClass('active');
         
         soundDuration = 500;
         reverse = false;
@@ -45,9 +44,8 @@ function start(){
         audification();
     });
     $("#pm_frequency").click(function(){
+        $('.sonification').removeClass('active');
         $(this).addClass('active');
-        $('#audification').removeClass('active');
-        $('#pm_loudness').removeClass('active');
         
         soundDuration = 500;
         reverse = false;
@@ -57,9 +55,8 @@ function start(){
         pm_frequency();
     });
     $("#pm_loudness").click(function(){
+        $('.sonification').removeClass('active');
         $(this).addClass('active');
-        $('#pm_frequency').removeClass('active');
-        $('#audification').removeClass('active');
         
         soundDuration = 500;
         reverse = false;
@@ -78,9 +75,7 @@ function start(){
         play = false;
     });
     $('#stop').click(function(){
-        $('#sudification').removeClass('active');
-        $('#pm_frequency').removeClass('active');
-        $('#pm_loudness').removeClass('active');
+        $('.sonification').removeClass('active');
         clearTimeoutsQueue();
         initScheduledSounds();
     });
@@ -283,6 +278,9 @@ function playSoundPattern(offset){
                                 }
                                 //scheduled[index].shift();
                                 if(repeat){loop(index);}
+                                if(!repeat && (scheduled[index].length === 0)){
+                                    $('.sonification').removeClass('active');
+                                }
                             }
                         }, k * soundDuration));
 
@@ -343,6 +341,9 @@ function resumeSoundPattern(){
                                 scheduled[index].shift();
                             }
                             if(repeat){loop(index);}
+                            if(!repeat && (scheduled[index].length === 0)){
+                                $('.sonification').removeClass('active');
+                            }
                         }
                     }, k * soundDuration));
             })(k);
