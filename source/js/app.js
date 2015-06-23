@@ -24,7 +24,7 @@ $(document).ready(function(){
     $('.btn').click(function() { this.blur(); });  
     //to fadeout errors once the user has seen them
     document.onmousemove = function () {
-        $('.err').fadeOut(3500);
+        $('.err').fadeOut(3700);
     };  
 });
     
@@ -33,8 +33,8 @@ function start(){
     data = getData();
     
     $("#audification").click(function(){
-        $('.sonification').removeClass('active');
-        $(this).addClass('active');
+        activateSonificationBtn('audification');
+        activateControlsBtn('play');
         
         soundDuration = 500;
         reverse = false;
@@ -44,8 +44,8 @@ function start(){
         audification();
     });
     $("#pm_frequency").click(function(){
-        $('.sonification').removeClass('active');
-        $(this).addClass('active');
+        activateSonificationBtn('pm_frequency');
+        activateControlsBtn('play');
         
         soundDuration = 500;
         reverse = false;
@@ -55,8 +55,8 @@ function start(){
         pm_frequency();
     });
     $("#pm_loudness").click(function(){
-        $('.sonification').removeClass('active');
-        $(this).addClass('active');
+        activateSonificationBtn('pm_loudness');
+        activateControlsBtn('play');
         
         soundDuration = 500;
         reverse = false;
@@ -66,32 +66,48 @@ function start(){
         pm_loudness();
     });
     $('#play').click(function(){
+        activateControlsBtn('play');
+        
         reverse = false;
         play = true;
         soundDuration = 500;
         resumeSoundPattern();
     });
     $('#pause').click(function(){
+        activateControlsBtn('pause');
+        
         play = false;
     });
     $('#stop').click(function(){
+        $('.controls').removeClass('active');
         $('.sonification').removeClass('active');
+        
+        //deactivate repeat
+        repeat = 0;
+        $('#repeat').removeClass('active');
+        
         clearTimeoutsQueue();
         initScheduledSounds();
     });
     $('#reverse').click(function(){
+        activateControlsBtn('reverse');
+        
         reverse = true;
         play = true;
         soundDuration = 500;
         resumeSoundPattern();
     });
     $('#bwd').click(function(){
+        activateControlsBtn('bwd');
+        
         reverse = true;
         play = true;
         soundDuration = 250;
         resumeSoundPattern();
     });
     $('#fwd').click(function(){
+        activateControlsBtn('fwd');
+        
         reverse = false;
         play = true;
         soundDuration = 250;
@@ -106,6 +122,23 @@ function start(){
             $(this).removeClass('active');
         }
     });
+}
+
+/* Highlight controls button */
+function activateControlsBtn(btn){
+    //activate controls only if one of the sonification methods was selected
+    if($('.sonification').hasClass('active')){
+        $('.controls').removeClass('active');
+        $('#'+btn).addClass('active');
+    }else{
+        $('#errContainer').append('<div class="col-md-4 err">Error. Please choose sonification type first </div>');
+    }
+}
+
+/* Highlight sonification button */
+function activateSonificationBtn(btn){
+    $('.sonification').removeClass('active');
+    $('#'+btn).addClass('active');
 }
 
 /* Clear js events queue, which is triggering sounds */
@@ -158,9 +191,9 @@ function getData(){
 /* Audification (direct mapping of data to pitch/frequency) */
 function audification(){
     play = true;
+    scheduled[data.colCount]='audification';
     //offset if the value is below or above reasonable hearable range
     offset = calculateOffsetAudification();
-    scheduled[data.colCount]='audification';
     playSoundPattern(offset);
 }
 
@@ -207,7 +240,7 @@ function calculateOffsetPMFrequency(){
         possibleVal = (colMin/colMax)*maxFreq;
         if(possibleVal < possibleMin) possibleMin = possibleVal;
     }
-    //represent data minimum as  minimum frequency (Hz) i.e. A0
+    //represent data minimum as A4 frequency
     if (possibleMin <= base_a4){
         offset = base_a4 - possibleMin;
     }else{
@@ -276,11 +309,8 @@ function playSoundPattern(offset){
                                 }else{
                                     scheduled[index].shift();
                                 }
-                                //scheduled[index].shift();
                                 if(repeat){loop(index);}
-                                if(!repeat && (scheduled[index].length === 0)){
-                                    $('.sonification').removeClass('active');
-                                }
+                                if(!repeat){clearButtons(index);} 
                             }
                         }, k * soundDuration));
 
@@ -311,42 +341,43 @@ function midiToFreq(midi){
 
 /* Resume playing sound after pause/play were pressed */
 function resumeSoundPattern(){
-    clearTimeoutsQueue(); //clear js events queue to eliminate sound overlaps
-    //depending on the sonification type, use different replays of scheduled sounds
-    play = true;
-    for(i = 0; i < data.colCount; i++){
-        colData = scheduled[i];
-        for (var k = 0; k < colData.length; k++) {
-            (function() {
-                if(reverse){
-                    var element = colData[colData.length-1-k];
-                }else{
-                    var element = colData[k];
-                }
-                var index = i;
-                var val = element;
-                    timeouts.push(setTimeout(function() { 
-                        if(play === true) {
-                            if(scheduled[data.colCount]==='pm_loudness'){
-                                freqOffset = val.freqOffset;
-                                loudness = val.loudness;
-                                playSound(freqOffset,loudness,soundDuration);
-                            }else{  //audification or pm_frequency
-                                freq = val;
-                                playSound(freq,soundLoudness,soundDuration);
+    //activate controls only if one of the sonification methods was selected
+    if($('.sonification').hasClass('active')){
+        clearTimeoutsQueue(); //clear js events queue to eliminate sound overlaps
+        //depending on the sonification type, use different replays of scheduled sounds
+        play = true;
+        for(i = 0; i < data.colCount; i++){
+            colData = scheduled[i];
+            for (var k = 0; k < colData.length; k++) {
+                (function() {
+                    if(reverse){
+                        var element = colData[colData.length-1-k];
+                    }else{
+                        var element = colData[k];
+                    }
+                    var index = i;
+                    var val = element;
+                        timeouts.push(setTimeout(function() { 
+                            if(play === true) {
+                                if(scheduled[data.colCount]==='pm_loudness'){
+                                    freqOffset = val.freqOffset;
+                                    loudness = val.loudness;
+                                    playSound(freqOffset,loudness,soundDuration);
+                                }else{  //audification or pm_frequency
+                                    freq = val;
+                                    playSound(freq,soundLoudness,soundDuration);
+                                }
+                                if(reverse){
+                                    scheduled[index].pop();
+                                }else{
+                                    scheduled[index].shift();
+                                }
+                                if(repeat){loop(index);}
+                                if(!repeat){clearButtons(index);} 
                             }
-                            if(reverse){
-                                scheduled[index].pop();
-                            }else{
-                                scheduled[index].shift();
-                            }
-                            if(repeat){loop(index);}
-                            if(!repeat && (scheduled[index].length === 0)){
-                                $('.sonification').removeClass('active');
-                            }
-                        }
-                    }, k * soundDuration));
-            })(k);
+                        }, k * soundDuration));
+                })(k);
+            }
         }
     }
 }
@@ -360,6 +391,14 @@ function loop(index){
                 eval(scheduled[scheduled.length - 1]+"()"); 
             }catch(err){}
         }, soundDuration);
+    }
+}
+
+/* Clear buttons highlighting if repeat is off */
+function clearButtons(index){
+    if(scheduled[index].length === 0){
+        $('.sonification').removeClass('active');
+        $('.controls').removeClass('active');
     }
 }
 

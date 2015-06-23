@@ -57,12 +57,12 @@
                         echo '<p>*Please don\'t leave the tab while the sound is playing, as this will interrupt the sound flow</p>';
                         echo '<div class="btn-toolbar" role="toolbar">';
                             echo '<div class=btn-group> 
-                                    <button class = "btn btn-default" id = "play"><div class="glyphicon glyphicon-play"></div><br/> Play </button>
-                                    <button class = "btn btn-default" id = "pause"><div class="glyphicon glyphicon-pause"></div><br/> Pause </button>
-                                    <button class = "btn btn-default" id = "stop"><div class="glyphicon glyphicon-stop"></div><br/> Stop </button>
-                                    <button class = "btn btn-default" id = "reverse"><div class= "glyphicon glyphicon-play icon-flipped"></div><br/> Reverse </button>
-                                    <button class = "btn btn-default" id = "bwd"><div class="glyphicon glyphicon-backward"></div><br/> Backward </button>
-                                    <button class = "btn btn-default" id = "fwd"><div class="glyphicon glyphicon-forward"></div><br/> Forward </button>
+                                    <button class = "btn btn-default controls" id = "play"><div class="glyphicon glyphicon-play"></div><br/> Play </button>
+                                    <button class = "btn btn-default controls" id = "pause"><div class="glyphicon glyphicon-pause"></div><br/> Pause </button>
+                                    <button class = "btn btn-default controls" id = "stop"><div class="glyphicon glyphicon-stop"></div><br/> Stop </button>
+                                    <button class = "btn btn-default controls" id = "reverse"><div class= "glyphicon glyphicon-play icon-flipped"></div><br/> Reverse </button>
+                                    <button class = "btn btn-default controls" id = "bwd"><div class="glyphicon glyphicon-backward"></div><br/> Backward </button>
+                                    <button class = "btn btn-default controls" id = "fwd"><div class="glyphicon glyphicon-forward"></div><br/> Forward </button>
                                     ';
                             echo '</div>';
                         echo '<button class = "btn btn-default" id = "repeat"><div class="glyphicon glyphicon-repeat"></div> <br/>Repeat</button>';
