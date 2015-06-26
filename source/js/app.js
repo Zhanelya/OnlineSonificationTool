@@ -75,7 +75,7 @@ function start(){
     });
     $('#pause').click(function(){
         activateControlsBtn('pause');
-        
+        clearTimeoutsQueue();
         play = false;
     });
     $('#stop').click(function(){
