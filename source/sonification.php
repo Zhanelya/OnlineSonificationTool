@@ -75,7 +75,7 @@
                         echo '<button id = "audification" class="btn btn-default sonification"> Audification </button>
                               <button id = "pm_frequency" class="btn btn-default sonification"> Parameter mapping: frequency </button>
                               <button id = "pm_loudness" class="btn btn-default sonification"> Parameter mapping: loudness </button><br/><br/>';
-                        echo '<p>*If you leave the tab while the sound is playing, this will pause the sound flow</p>';
+                        echo '<p>*Leaving the tab while the sound is playing will pause the sound flow</p>';
                         echo '<div class="btn-toolbar" role="toolbar">';
                             echo '<div class=btn-group> 
                                     <button class = "btn btn-default controls" id = "play"><div class="glyphicon glyphicon-play"></div><br/> Play </button>
