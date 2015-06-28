@@ -17,7 +17,7 @@
             <h4>Supported browsers</h4>
             <div class="row">
                 <div class="col-md-2">
-                    <b>Desktop</b>
+                    Desktop
                 </div>
                 <div class="col-md-10">
                     Firefox (Gecko) 25.0+, Opera 15.0+, Safari (WebKit) 6.9+, Chrome 14.0+, 
@@ -27,7 +27,7 @@
             <br/>
             <div class="row">
                 <div class="col-md-2">
-                    <b>Mobile</b>
+                    Mobile
                 </div>
                 <div class="col-md-10">
                     Firefox Mobile (Gecko) 37.0+,  Firefox OS 2.2+, Chrome for Android 33.0+, Safari Mobile 6+, 
