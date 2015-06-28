@@ -14,10 +14,31 @@
     <div class="wrapper ">
         <div class="container fluid">
             <h1>Sonification</h1>
+            <h4>Supported browsers</h4>
+            <div class="row">
+                <div class="col-md-2">
+                    <b>Desktop</b>
+                </div>
+                <div class="col-md-10">
+                    Firefox (Gecko) 25.0+, Opera 15.0+, Safari (WebKit) 6.9+, Chrome 14.0+, 
+                    <br/>Internet Explorer not supported
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-md-2">
+                    <b>Mobile</b>
+                </div>
+                <div class="col-md-10">
+                    Firefox Mobile (Gecko) 37.0+,  Firefox OS 2.2+, Chrome for Android 33.0+, Safari Mobile 6+, 
+                    <br/>Android basic browser not supported, IE Phone not supported, Opera Mobile not supported
+                </div>
+            </div>
+            <br/>
             <form action="upload.php" method="post" enctype="multipart/form-data">
             <div class="row">
-                <div class="col-md-4"><h4>Please select a .csv file:</div>
-                <div class="col-md-4"><h4><input type="file" name="csv" value="" /><h4></div>
+                <div class="col-md-4"><h4>Please select a .csv file:</h4></div>
+                <div class="col-md-4"><h4><input type="file" name="csv" value="" /></h4></div>
             </div>
             <div class="row">
                 <p class="col-md-8">*Please note that the file should contain numerical data only, and the top row should contain the field names</p>

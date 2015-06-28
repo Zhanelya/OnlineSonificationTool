@@ -26,6 +26,12 @@ $(document).ready(function(){
     document.onmousemove = function () {
         $('.err').fadeOut(3700);
     };  
+    //if user leaves the tab, pause the sound flow
+    window.onblur = function () {
+        if($('.sonification').hasClass('active')){
+            $('#pause').click();
+        }
+    }
 });
     
 /* Initialise script */
@@ -394,7 +400,7 @@ function loop(index){
     }
 }
 
-/* Clear buttons highlighting if repeat is off */
+/* Clear buttons highlighting if repeat is off and the sound pattern is finished*/
 function clearButtons(index){
     if(scheduled[index].length === 0){
         $('.sonification').removeClass('active');
