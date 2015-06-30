@@ -34,7 +34,7 @@
                     <br/>Android basic browser not supported, IE Phone not supported, Opera Mobile not supported
                 </div>
             </div>
-            <br/>
+            <br/><br/>
             <form action="upload.php" method="post" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-4"><h4>Please select a .csv file:</h4></div>
@@ -64,7 +64,7 @@
             </form>
             </table>
         </div>
-        <br/> <br/> 
+        <br/> 
         <?php 
             if(isset($_SESSION['csvArr']) && !empty($_SESSION['csvArr'])) {
                 if(count($_SESSION["csvArr"])>0){
@@ -72,21 +72,43 @@
                     echo '<div id="colCount" style="display:none">'.$_SESSION["csvColsCnt"].'</div>
                           <div id="rowCount" style="display:none">'.$_SESSION["csvRowsCnt"].'</div>'; 
                     echo '<div class="container fluid">';
+                        echo '<h4>Instructions</h4>';
+                        echo '<ul>';
+                           if($_SESSION["csvColsCnt"]>1){
+                           echo'<li>First, select if you want to sonify all columns at once by pressing <i>Simultaneously</i>, or if you want to sonify consecutively column by column by pressing <i>Column at a time</i></li>';
+                           }
+                           echo'<li>Select the sonification technique using <i>Audification</i>, <i>Parameter mapping: frequency</i>, or <i>Parameter mapping: loudness</i> buttons, and the sound should start playing automatically</li>
+                                <li><i>Pause</i> will pause the sound flow, <i>Play</i> will allow to resume, and <i>Stop</i> to stop</li>
+                                <li><i>Reverse</i> will play the sound in reverse</li>
+                                <li><i>Backward</i> will play the sound in reverse with double speed</li>
+                                <li><i>Forward</i> will simply play the sound with double speed</li>
+                                <li><i>Repeat</i> will enable repeat of the sound flow, which will be put in a loop until you press <i>Repeat</i> again or <i>Stop</i></li>
+                                <li>Leaving the tab while the sound is playing will pause the sound flow</li>';
+                                if($_SESSION["csvColsCnt"]>1){
+                                    echo'<li>Changing between simultaneous (<i>Simultaneously</i>) and columnwise (<i>Column at a time</i>) sonification while the sound is playing will cause the current sonification flow to stop, and you will be asked to choose the technique of sonification again</li>';
+                                }
+                        echo'</ul><br/> ';    
+                        if($_SESSION["csvColsCnt"]>1){
+                            echo '<div class="btn-group">
+                                    <button class = "btn btn-default soundflow" id = "simultaneous"><div class="glyphicon glyphicon-random"></div> <br/>Simultaneously</button>
+                                    <button class = "btn btn-default soundflow" id = "columnwise"><div class="glyphicon glyphicon-sort-by-attributes-alt"></div> <br/>Column at a time</button>
+                                  </div><br/><br/>'; //if data has more than 1 column/field
+                            
+                        }    
                         echo '<button id = "audification" class="btn btn-default sonification"> Audification </button>
                               <button id = "pm_frequency" class="btn btn-default sonification"> Parameter mapping: frequency </button>
                               <button id = "pm_loudness" class="btn btn-default sonification"> Parameter mapping: loudness </button><br/><br/>';
-                        echo '<p>*Leaving the tab while the sound is playing will pause the sound flow</p>';
                         echo '<div class="btn-toolbar" role="toolbar">';
                             echo '<div class=btn-group> 
-                                    <button class = "btn btn-default controls" id = "play"><div class="glyphicon glyphicon-play"></div><br/> Play </button>
                                     <button class = "btn btn-default controls" id = "pause"><div class="glyphicon glyphicon-pause"></div><br/> Pause </button>
+                                    <button class = "btn btn-default controls" id = "play"><div class="glyphicon glyphicon-play"></div><br/> Play </button>
                                     <button class = "btn btn-default controls" id = "stop"><div class="glyphicon glyphicon-stop"></div><br/> Stop </button>
                                     <button class = "btn btn-default controls" id = "reverse"><div class= "glyphicon glyphicon-play icon-flipped"></div><br/> Reverse </button>
                                     <button class = "btn btn-default controls" id = "bwd"><div class="glyphicon glyphicon-backward"></div><br/> Backward </button>
                                     <button class = "btn btn-default controls" id = "fwd"><div class="glyphicon glyphicon-forward"></div><br/> Forward </button>
                                     ';
                             echo '</div>';
-                        echo '<button class = "btn btn-default" id = "repeat"><div class="glyphicon glyphicon-repeat"></div> <br/>Repeat</button>';
+                            echo '<button class = "btn btn-default" id = "repeat"><div class="glyphicon glyphicon-repeat"></div> <br/>Repeat</button>';
                         echo '</div>';    
                         echo '<div class="row" id = "errContainer"></div>';
                         for($i=0; $i<count($_SESSION["csvArr"]);$i++){

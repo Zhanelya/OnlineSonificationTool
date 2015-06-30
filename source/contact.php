@@ -12,8 +12,9 @@
     <div class="wrapper ">
         <div class="container fluid">
             <h1>Contact</h1>
-            <h4>Zhanelya Subebayeva </h4>
-            <h4>MSc Computer Science, QMUL</h4>
-            <h4>Telephone: +44 (0)754394523</h4>
+            <p>Zhanelya Subebayeva </p>
+            <p>MSc Computer Science, QMUL</p>
+            <p>Email: subebo91@inbox.ru</p>
+            <p>Telephone: +44 (0)754394523</p>
         </div>
 <?php require_once 'footer.php';?>
