@@ -322,7 +322,6 @@ function playSoundPattern(offset){
                             var freqOffset = freqDifference*index;
                             var val = {freqOffset:freqOffset,loudness:loudness};
                         }  
-                        console.log(val);
                         scheduled[index].push(val);      //schedule sounds   
                         if(!columnwise){
                             var t = k * soundDuration; //play values from all columns for every row
