@@ -1,20 +1,25 @@
 /* Zhanelya Subebayeva */
 // create web audio api context
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();   
-var base_a4 = 440; // set A4=440Hz (min frequency)
-var maxFreq = 2000; // set max frequency 
+
+var base_a4 = 440; // set A4=440Hz
+var minFreq = 440; // min frequency
+var maxFreq = 1500; // set max frequency 
+var freqDifference = 50; // to ease distinguishing columns in PM using loudness
 var minLoudness = 0.1; // set min loudness 
 var maxLoudness = 1.0; // set max loudness 
 var soundLoudness = 0.3; //default single sound loudness
 var soundDuration = 500; //default single sound duration
-var numericData; //flag to check if all data is numeric
+
 var play = true; //flag for play/pause
 var reverse = false; //flag for reversed play
-var scheduled = []; //store sounds scheduled to play (to enable pause/play)
 var timeouts = []; //store timeouts (to allow stop button clear scheduled sounds)
 var repeat = 0; //flag for looping on/off
-var data; //data array
 var columnwise = 0; //flag for columnwise data flow
+var scheduled = []; //store sounds scheduled to play (to enable pause/play)
+
+var numericData; //flag to check if all data is numeric
+var data; //data array
 
 $(document).ready(function(){
     if(document.getElementById("colCount") &&                  //if file was loaded
@@ -217,7 +222,7 @@ function pm_frequency(){
     play = true;
     scheduled[data.colCount]='pm_frequency';
     //offset if the value is below or above reasonable hearable range
-    offset = calculateOffsetPMFrequency();
+    offset = calculateOffsetPM();
     playSoundPattern(offset);
 }
 
@@ -225,11 +230,14 @@ function pm_frequency(){
 function pm_loudness(){
     play = true;
     scheduled[data.colCount]='pm_loudness';
-    playSoundPattern();
+    //offset if the value is below or above reasonable hearable range
+    offset = calculateOffsetPM();
+    playSoundPattern(offset);
 }
 
 /* Calculate the offset needed for audification in order to 
- * fit the sound pattern into reasonable audible range */
+ * fit the sound pattern into reasonable audible range 
+ * (to be equal or above of the predefined minimum frequency)*/
 function calculateOffsetAudification(){
     possibleMin = Number.MAX_VALUE;
     for (i = 0; i < data.colCount; i++){
@@ -237,29 +245,43 @@ function calculateOffsetAudification(){
         if(colMin < possibleMin) possibleMin = colMin;
     }
     //represent data minimum as A4 frequency
-    if (possibleMin <= base_a4){
-        offset = base_a4 - possibleMin;
+    if (possibleMin <= minFreq){
+        offset = minFreq - possibleMin;
     }else{
-        offset = -(possibleMin - base_a4);
+        offset = -(possibleMin - minFreq);
     } 
     return offset;
 }
 
-/* Calculate the offset needed for parameter mapping with a use of frequency 
- * in order to fit the sound pattern into reasonable audible range */
-function calculateOffsetPMFrequency(){
-    possibleMin = Number.MAX_VALUE;
+/* Calculate the offset needed for parameter mapping
+ * in order to fit the sound pattern into reasonable audible range
+ * (to be equal or above of the predefined minimum parameter value) */
+function calculateOffsetPM(){
+    var max = Number.MIN_VALUE;
+    var possibleMin = Number.MAX_VALUE;
+    if(scheduled[data.colCount]==='pm_frequency'){
+        maxParam = maxFreq;
+        minParam = minFreq;
+    }else if(scheduled[data.colCount]==='pm_loudness'){
+        maxParam = maxLoudness;
+        minParam = minLoudness;
+    }
+    //find max data value
+    for(k=0; k< data.colCount; k++){
+        colMax = data.maxDataVals[k];
+        if(max < colMax) max = colMax;
+    }
+    //find possible min parameter value within the data
     for (i = 0; i < data.colCount; i++){
         colMin = data.minDataVals[i];
-        colMax = data.maxDataVals[i];
-        possibleVal = (colMin/colMax)*maxFreq;
+        possibleVal = (colMin/max)*maxParam;
         if(possibleVal < possibleMin) possibleMin = possibleVal;
     }
-    //represent data minimum as A4 frequency
-    if (possibleMin <= base_a4){
-        offset = base_a4 - possibleMin;
+    //represent data minimum as a predefined minimum parameter value
+    if (possibleMin <= minParam){
+        offset = minParam - possibleMin;
     }else{
-        offset = -(possibleMin - base_a4);
+        offset = -(possibleMin - minParam);
     } 
     return offset;
 }
@@ -277,18 +299,16 @@ function playSoundPattern(offset){
         }
     }
     if(numericData === 1){ 
+            //find max data value
+            var max = Number.MIN_VALUE;
+            for(var k=0; k< data.colCount; k++){
+                colMax = data.maxDataVals[k];
+                if(max < colMax) max = colMax;
+            }
             for(var i = 0; i < data.colCount; i++){
                 colData = data.dataVals[i];
-                if(scheduled[data.colCount]==='pm_frequency'||
-                   scheduled[data.colCount]==='pm_loudness'){
-                    colMax = data.maxDataVals[i]; // to be used for parameter mapping
-                }
                 for (var k = 0; k < colData.length; k++) {
                     (function() {
-                        if(scheduled[data.colCount]==='pm_frequency'||
-                            scheduled[data.colCount]==='pm_loudness'){
-                            var max = colMax; // to be used for parameter mapping
-                        }
                         var element = colData[k];
                         var index = i;
                         if(scheduled[data.colCount]==='audification'){
@@ -298,10 +318,11 @@ function playSoundPattern(offset){
                             var freq = closestMidi((element/max) * maxFreq + offset);
                             var val = freq;
                         }else if(scheduled[data.colCount]==='pm_loudness'){
-                            var loudness = (element/max) * maxLoudness;
-                            var freqOffset = base_a4*index;
+                            var loudness = (element/max) * maxLoudness + offset;
+                            var freqOffset = freqDifference*index;
                             var val = {freqOffset:freqOffset,loudness:loudness};
-                        }    
+                        }  
+                        console.log(val);
                         scheduled[index].push(val);      //schedule sounds   
                         if(!columnwise){
                             var t = k * soundDuration; //play values from all columns for every row
@@ -315,13 +336,13 @@ function playSoundPattern(offset){
                                         if(reverse){
                                             //if reverse is on, play from last to first
                                             freq = scheduled[index][scheduled[index].length-1];
-                                            playSound(freq,soundLoudness,soundDuration);
+                                            playSound(index,freq,soundLoudness,soundDuration);
                                         }else{
                                             //if reverse is off, play from first to last
-                                            playSound(freq,soundLoudness,soundDuration);
+                                            playSound(index,freq,soundLoudness,soundDuration);
                                         }
                                     }else if(scheduled[data.colCount]==='pm_loudness'){
-                                        playSound(freqOffset,loudness,soundDuration); 
+                                        playSound(index,freqOffset,loudness,soundDuration); 
                                     }  
                                     //remove played sounds from schedule
                                     if(reverse){
@@ -329,7 +350,7 @@ function playSoundPattern(offset){
                                     }else{
                                         scheduled[index].shift();
                                     }
-                                    if(repeat && finished()){loop(index);}
+                                    if(repeat && finished()){loop();}
                                     if(!repeat && finished()){clearBtns();} 
                                 }
                             }, t));
@@ -396,17 +417,17 @@ function resumeSoundPattern(){
                                 if(scheduled[data.colCount]==='pm_loudness'){
                                     freqOffset = val.freqOffset;
                                     loudness = val.loudness;
-                                    playSound(freqOffset,loudness,soundDuration);
+                                    playSound(index,freqOffset,loudness,soundDuration);
                                 }else{  //audification or pm_frequency
                                     freq = val;
-                                    playSound(freq,soundLoudness,soundDuration);
+                                    playSound(index,freq,soundLoudness,soundDuration);
                                 }
                                 if(reverse){
                                     scheduled[index].pop();
                                 }else{
                                     scheduled[index].shift();
                                 }
-                                if(repeat && finished()){loop(index);}
+                                if(repeat && finished()){loop();}
                                 if(!repeat && finished()){clearBtns();}  
                             }
                         }, t));
@@ -417,37 +438,48 @@ function resumeSoundPattern(){
 }
 
 /* Repeat if repeat is on */
-function loop(index){
+function loop(){
     setTimeout(function(){
-        //call a sonification function (audification/pm_frequency/pm_loudness)
         try{
+            //call a sonification function (audification/pm_frequency/pm_loudness)
             //last element  of the scheduled array stores what sonification technique is active
             eval(scheduled[scheduled.length - 1]+"()"); 
         }catch(err){}
     }, soundDuration);
 }
 
-/* Play a single sound */
-function playSound(freq, loudness, duration){
-    var attack = 5,
+/* Play a single sound 
+** Spectra and Envelope affect timbre 
+** Spectra is controlled by Oscillator wave type (shape) 
+** Envelope is controlled by attack, sustain and decay */ 
+function playSound(colNo, freq, loudness, duration){
+    var c = (colNo+1)/data.colCount;
+
+    var waveshapes = ["sine","triangle","sawtooth","square"];
+    
+    var attack = c*duration*1/4,
+        sustain = c*duration*3/4,
+        decay = duration,
+        
         gain = audioCtx.createGain(), 
         osc = audioCtx.createOscillator(); 
-
+    
     gain.connect(audioCtx.destination); 
     gain.gain.setValueAtTime(0, audioCtx.currentTime);
     gain.gain.linearRampToValueAtTime(loudness, audioCtx.currentTime + attack / 1000);
-    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration / 1000);
-
+    gain.gain.linearRampToValueAtTime(loudness, audioCtx.currentTime + sustain / 1000);
+    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + decay / 1000);
+  
     if(scheduled[data.colCount]==='pm_frequency'||
        scheduled[data.colCount]==='audification'){
         osc.frequency.value = freq;
     }else if(scheduled[data.colCount]==='pm_loudness'){
-        osc.frequency.value = base_a4 + freq; //add offset to differentiate columns
+        osc.frequency.value = base_a4 + freq; //set frequency to default and add offset (freq) to differentiate columns
     }
     
-    osc.type = "sine";
+    osc.type = waveshapes[colNo%4]; //choose 1 of the 4 wave shapes
     osc.detune = 0;
-    osc.connect(gain); 
+    osc.connect(gain);
     osc.start(0);
 
     setTimeout(function() { 
