@@ -4,10 +4,10 @@ var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 var base_a4 = 440; // set A4=440Hz
 var minFreq = 440; // min frequency
-var maxFreq = 1500; // set max frequency 
+var maxFreq = 1200; // set max frequency (frequency may still take higher values due to offset)
 var freqDifference = 50; // to ease distinguishing columns in PM using loudness
 var minLoudness = 0.1; // set min loudness 
-var maxLoudness = 1.0; // set max loudness 
+var maxLoudness = 1.0; // set max loudness (loudness may still take higher values due to offset)
 var soundLoudness = 0.3; //default single sound loudness
 var soundDuration = 500; //default single sound duration
 
