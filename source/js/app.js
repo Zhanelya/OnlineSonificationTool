@@ -447,7 +447,7 @@ function loop(){
     }, soundDuration);
 }
 
-/* Play a single sound  
+/* Play a single sound
 ** Spectra and Envelope affect timbre 
 ** Spectra is controlled by Oscillator wave type (shape) 
 ** Envelope is controlled by attack, sustain and decay */ 
