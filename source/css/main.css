@@ -1,5 +1,10 @@
 /* Zhanelya Subebayeva */
 /* Web Page Wrapper */
+*{
+    font-family: Tahoma, Geneva, sans-serif;
+    font-size: medium;
+}
+
 .wrapper {
   /* position and size */
   min-height: 100%;
@@ -15,14 +20,54 @@
   background-size: 200%;
   padding-bottom: 3em;
 }
+
+/* menu */
 nav{
   z-index: 1;  
 }
+
 /* error message */
 .err{
     color : firebrick;
     text-shadow: 2px 2px white;
 }
+
+.animated-bg{ 
+        min-height: 100%;
+        min-width: 100%;
+        background-image: url(../img/note.png);
+	background-position: 0px 0px;
+	background-repeat: repeat;
+        background-size: 10em;
+        animation: animatedBG 70s linear infinite;
+}
+@keyframes animatedBG {
+	from { background-position: 100% 100%; }
+	to { background-position: 0 100%; }
+}
+
+.tile{
+    padding: 2em; 
+    margin-bottom: 1em;
+}
+.tile-col{
+    padding-left: 1.5em; 
+    padding-right: 1.5em; 
+}
+.tile-row{
+    padding-left: 0.5em; 
+    padding-right: 0.5em; 
+    padding-bottom: 1em;
+}
+
+.blue {background-color: cornflowerblue;}
+.green {background-color: yellowgreen;}
+.yellow {background-color: gold;}
+.orange {background-color: coral;}
+.red {background-color: orangered;}
+.pink {background-color:pink;}
+.beige {background-color: blanchedalmond;}
+
 /* to flip bootstrap icons horizontally(used for reverse btn) */
 .icon-flipped {
     transform: scaleX(-1);
