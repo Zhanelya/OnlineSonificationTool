@@ -20,11 +20,26 @@ var scheduled = []; //store sounds scheduled to play (to enable pause/play)
 
 var numericData; //flag to check if all data is numeric
 var data; //data array
+var numericData = 0;
+
+/* check if data is numeric */
+function isDataNumeric(){
+//check if the data values are numeric
+    numericData = 1;
+    for (var x = 0; x < data.colCount ;x++){
+        for (var y = 0; y < data.dataVals[x].length; y++){
+            if(!$.isNumeric(data.dataVals[x][y])){
+                numericData = 0;
+            }
+        }
+    }
+}
 
 $(document).ready(function(){
     if(document.getElementById("colCount") &&                  //if file was loaded
       (document.getElementById("colCount").innerHTML > 0)){    //if file contains at least 1 column
          start();
+         initGraph('Row number','User data unit');
       }
     //to prevent buttons from highlighting (bootstrap-specific)  
     $('.btn').click(function() { this.blur(); });  
@@ -43,7 +58,8 @@ $(document).ready(function(){
 /* Initialise script */
 function start(){
     data = getData();
-    
+    isDataNumeric();
+         
     $("#audification").click(function(){
         activateSonificationBtn('audification');
     });
@@ -123,12 +139,14 @@ function getData(){
     var colCount = document.getElementById("colCount").innerHTML; //get number of columns
     var rowCount = document.getElementById("rowCount").innerHTML; //get number of rows
     
-    var dataVals = new Array(colCount);     //colCount-D array with all values for each column
+    var colNames = new Array();
+    
+    var dataVals = new Array();     //colCount-D array with all values for each column
     for (i=0;i<colCount;i++){dataVals[i]=new Array();} //initialise array for each column
     
-    var maxDataVals = new Array(colCount);  //array for max values in each column
+    var maxDataVals = new Array();  //array for max values in each column
     for (var i = 0; i < colCount; i++) maxDataVals[i] = Number.MIN_VALUE;
-    var minDataVals = new Array(colCount);  //array for min values in each column
+    var minDataVals = new Array();  //array for min values in each column
     for (var i = 0; i < colCount; i++) minDataVals[i] = Number.MAX_VALUE;
     
     $('[class*="value"]').each(function(){
@@ -140,11 +158,24 @@ function getData(){
         dataVals[colNo].push(parseFloat(this.innerHTML));
     });
     
+    $('[class*="name"]').each(function(){
+        var colNo = this.className.split('-')[1];           //column number
+        colNames[colNo] = this.innerHTML;
+    });
+    
+    data.colNames = colNames;
     data.colCount = colCount;
     data.rowCount = rowCount;
     data.dataVals = dataVals;
     data.maxDataVals = maxDataVals;
     data.minDataVals = minDataVals;
+    
+    var max = Number.MIN_VALUE;
+    for(var k=0; k< data.colCount; k++){
+        colMax = data.maxDataVals[k];
+        if(max < colMax) max = colMax;
+    }
+    data.max = max;
     
     return data;
 }
@@ -192,6 +223,9 @@ function clearBtns(){
     //deactivate repeat
     repeat = 0;
     $('#repeat').removeClass('active');
+    
+    //set sound Duration back to default
+    soundDuration = 500;
 }   
 
 /* Clear js events queue, which is triggering sounds */
@@ -257,7 +291,6 @@ function calculateOffsetAudification(){
  * in order to fit the sound pattern into reasonable audible range
  * (to be equal or above of the predefined minimum parameter value) */
 function calculateOffsetPM(){
-    var max = Number.MIN_VALUE;
     var possibleMin = Number.MAX_VALUE;
     if(scheduled[data.colCount]==='pm_frequency'){
         maxParam = maxFreq;
@@ -266,15 +299,10 @@ function calculateOffsetPM(){
         maxParam = maxLoudness;
         minParam = minLoudness;
     }
-    //find max data value
-    for(k=0; k< data.colCount; k++){
-        colMax = data.maxDataVals[k];
-        if(max < colMax) max = colMax;
-    }
     //find possible min parameter value within the data
     for (i = 0; i < data.colCount; i++){
         colMin = data.minDataVals[i];
-        possibleVal = (colMin/max)*maxParam;
+        possibleVal = (colMin/data.max)*maxParam;
         if(possibleVal < possibleMin) possibleMin = possibleVal;
     }
     //represent data minimum as a predefined minimum parameter value
@@ -289,22 +317,7 @@ function calculateOffsetPM(){
 /* Play a sound pattern (implements different approaches for different sonification techniques) */
 function playSoundPattern(offset){
     offset = typeof offset !== 'undefined' ? offset : 0; //set default param value
-    //check if the data values are numeric
-    numericData = 1;
-    for (var x = 0; x < data.colCount ;x++){
-        for (var y = 0; y < data.dataVals[x].length; y++){
-            if(!$.isNumeric(data.dataVals[x][y])){
-                numericData = 0;
-            }
-        }
-    }
     if(numericData === 1){ 
-            //find max data value
-            var max = Number.MIN_VALUE;
-            for(var k=0; k< data.colCount; k++){
-                colMax = data.maxDataVals[k];
-                if(max < colMax) max = colMax;
-            }
             for(var i = 0; i < data.colCount; i++){
                 colData = data.dataVals[i];
                 for (var k = 0; k < colData.length; k++) {
@@ -315,10 +328,10 @@ function playSoundPattern(offset){
                             var freq = element + offset;
                             var val = freq;
                         }else if(scheduled[data.colCount]==='pm_frequency'){
-                            var freq = closestMidi((element/max) * maxFreq + offset);
+                            var freq = closestMidi((element/data.max) * maxFreq + offset);
                             var val = freq;
                         }else if(scheduled[data.colCount]==='pm_loudness'){
-                            var loudness = (element/max) * maxLoudness + offset;
+                            var loudness = (element/data.max) * maxLoudness + offset;
                             var freqOffset = freqDifference*index;
                             var val = {freqOffset:freqOffset,loudness:loudness};
                         }  
