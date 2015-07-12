@@ -2,10 +2,20 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
+var userDataUnitX = "Row number",
+    userDataUnitY = "Data unit";
+    userDataPointSize = 10;
+    
 /* Draw a graph */
-function initGraph (dataUnitX, dataUnitY) { 
+function initGraph () { 
     if(numericData === 1){
+        $( "#slider" ).slider({
+            max: 18,
+            min: 2,
+            step: 1,
+            value: 10
+          });
+
         var graphData = getGraphData();
         $('#graph-container').highcharts({
             series: graphData,
@@ -14,12 +24,12 @@ function initGraph (dataUnitX, dataUnitY) {
             },
             xAxis: {
                 title: {
-                    text: dataUnitX
+                    text: userDataUnitX
                 }
             },
             yAxis: {
                 title: {
-                    text: dataUnitY
+                    text: userDataUnitY
                 }
             },
             plotOptions: {
@@ -34,7 +44,7 @@ function initGraph (dataUnitX, dataUnitY) {
                     },
                     marker: {
                         enabled: true,
-                        radius: 9
+                        radius: userDataPointSize
                     }
                 }
             },
@@ -117,3 +127,27 @@ function getFreq(dataVal){
     }
     return closestMidi((dataVal/max) * maxFreq + offset);
 }
+
+/* Get user data unit for X axis and redraw the graph */
+function getDataUnitX(){
+    userDataUnitX = document.getElementById("userDataUnitX").value;
+    initGraph();
+}
+/* Get user data unit for Y axis and redraw the graph */
+function getDataUnitY(){
+    userDataUnitY = document.getElementById("userDataUnitY").value;
+    initGraph();
+}
+
+$(document).ready(function(){
+    if(numericData === 1){
+        $("#slider").slider({
+            slide: function(event, slider) {
+                userDataPointSize = slider.value;
+                initGraph();
+            }
+        });
+    }
+});
+
+

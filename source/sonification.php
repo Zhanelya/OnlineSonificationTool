@@ -34,8 +34,35 @@
                     <br/>Android basic browser not supported, IE Phone not supported, Opera Mobile not supported
                 </div>
             </div>
-            <br/><br/>
+            <br/>
             <form action="upload.php" method="post" enctype="multipart/form-data">
+            <h4>Sample .csv data:</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <table border="1px solid black" width="50%">
+                        <tr>
+                            <th>heading1</th>
+                            <th>heading2</th>
+                            <th>...</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>3</td>
+                            <td>5</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>6</td>
+                            <td>7</td>
+                        </tr>
+                        <tr>
+                            <td>...</td>
+                            <td>...</td>
+                            <td>...</td>
+                        </tr>
+                    </table>
+                </div>  
+            </div><br/>    
             <h4>Please select a .csv file:</h4>
             <div class="row">
                 <div class="col-md-3"><h4><input type="file" name="csv" value="" /></h4></div>
@@ -43,7 +70,7 @@
             </div>
             <div class="row">
                 <p class="col-md-12">*Please note that the file should contain numerical data only, and the top row should contain the field names</p>
-            </div>    
+            </div>
             <div class="row">
                 <div class="col-md-4"></div>
                 <div class="col-md-4">
@@ -76,18 +103,22 @@
                                     echo '<h4>Instructions</h4>';
                                     echo '<ul>';
                                        if($_SESSION["csvColsCnt"]>1){
-                                       echo'<li>To explore audification and parameter mapping, first, select if you want to sonify all columns at once by pressing <b>Simultaneously</b>, or if you want to sonify consecutively column by column by pressing <b>Column at a time</b></li>';
+                                        echo'<li>To explore <b>audification</b> and <b>parameter mapping</b>, first, select if you want to sonify all columns at once by pressing <b>Simultaneously</b>, or if you want to sonify consecutively column by column by pressing <b>Column at a time</b></li>';
+                                        echo'<li>Select the sonification technique using <b>Audification</b>, <b>Parameter mapping: frequency</b>, or <b>Parameter mapping: loudness</b> buttons, and the sound should start playing automatically</li>';
+                                       }else{
+                                        echo'<li>To explore <b>audification</b> and <b>parameter mapping</b>, first select the sonification technique using <b>Audification</b>, <b>Parameter mapping: frequency</b>, or <b>Parameter mapping: loudness</b> buttons, and the sound should start playing automatically</li>';
+                                      
                                        }
-                                       echo'<li>Select the sonification technique using <b>Audification</b>, <b>Parameter mapping: frequency</b>, or <b>Parameter mapping: loudness</b> buttons, and the sound should start playing automatically</li>
-                                            <li><b>Pause</b> will pause the sound flow, <b>Play</b> will allow to resume, and <b>Stop</b> to stop</li>
+                                       echo'<li><b>Pause</b> will pause the sound flow, <b>Play</b> will allow to resume, and <b>Stop</b> to stop</li>
                                             <li><b>Reverse</b> will play the sound in reverse</li>
                                             <li><b>Backward</b> will play the sound in reverse with double speed</li>
                                             <li><b>Forward</b> will simply play the sound with double speed</li>
-                                            <li><b>Repeat</b> will enable repeat of the sound flow, which will be put in a loop until you press <i>Repeat</i> again or <i>Stop</i></li>
+                                            <li><b>Repeat</b> will enable repeat of the sound flow, which will be put in a loop until you press <b>Repeat</b> again or <b>Stop</b></li>
                                             <li>Leaving the tab while the sound is playing will pause the sound flow</li>';
                                             if($_SESSION["csvColsCnt"]>1){
                                                 echo'<li>Changing between simultaneous (<b>Simultaneously</b>) and columnwise (<b>Column at a time</b>) sonification while the sound is playing will cause the current sonification flow to stop, and you will be asked to choose the technique of sonification again</li>';
                                             }
+                                       echo '<li>To explore <b>model-based sonification</b>, please see the graph at the bottom of the page. </li>';
                                     echo'</ul><br/> '; 
                                     
                                 echo '</div>
@@ -131,18 +162,43 @@
                                     }
                                 echo '</div>';
                             echo '</div>';
-                            echo '<div class="row tile beige"><div class="col-md-12">
-                                    <div id="graph-container" style="width:100%; height:400px;"></div>
-                                  </div></div>';
+                            echo '<div class="row tile beige">
+                                    <div class="col-md-6">
+                                        <h4>Instructions</h4>
+                                        <ul><li>Every data point has a corresponding sound which can be played by <b>clicking on the data point</b></li>
+                                             <li>You can change the names of the data units for X and Y axis by entering a new name and hitting the apply button</li>
+                                             <li>You can change the size of the datapoints by changing the position of the corresponding slider</li>
+                                        </ul><br/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="userDataUnitY">Change data unit for Y axis:</label><br/>
+                                        <div class="col-md-6" ><input type="text" id="userDataUnitY"/></div>
+                                        <button class="btn btn-default" onclick="getDataUnitY()">Apply</button><br/>
+                                        <label for="userDataUnitX">Change data unit for X axis:</label><br/>
+                                        <div class="col-md-6" ><input type="text" id="userDataUnitX"/></div>
+                                        <button class="btn btn-default" onclick="getDataUnitX()">Apply</button><br/>
+                                        <label for="slider">Change the size of data points:</label><br/>
+                                        <div class="col-md-5"><div id="slider"></div></div><br/><br/>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div id="graph-container" style="width:100%; height:400px;"></div>
+                                    </div>
+                                  </div>';
                     echo '</div>';
                     echo '<br/>';
                 }
             }   
         ?>
-      
+    <div id="slider"></div>  
 <?php require_once 'footer.php';?>
+<!-- JQuery library, minified -->    
 <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> <!-- For tabs support -->
+<!-- JQuery-UI library -->   
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<!-- Bootstrap library for tabs support -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> 
+<!-- Highcharts library for charts support -->
 <script src="http://code.highcharts.com/highcharts.js"></script>
 <script src="js/app.js"></script>
 <script src="js/graph.js"></script>

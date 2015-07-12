@@ -39,7 +39,7 @@ $(document).ready(function(){
     if(document.getElementById("colCount") &&                  //if file was loaded
       (document.getElementById("colCount").innerHTML > 0)){    //if file contains at least 1 column
          start();
-         initGraph('Row number','User data unit');
+         initGraph();
       }
     //to prevent buttons from highlighting (bootstrap-specific)  
     $('.btn').click(function() { this.blur(); });  
