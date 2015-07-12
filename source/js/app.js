@@ -35,6 +35,7 @@ function isDataNumeric(){
     }
 }
 
+/* Initialise script */
 $(document).ready(function(){
     if(document.getElementById("colCount") &&                  //if file was loaded
       (document.getElementById("colCount").innerHTML > 0)){    //if file contains at least 1 column
@@ -55,7 +56,7 @@ $(document).ready(function(){
     };
 });
     
-/* Initialise script */
+/* Prepare data and init sonification buttons */
 function start(){
     data = getData();
     isDataNumeric();

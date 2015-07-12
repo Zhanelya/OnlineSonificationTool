@@ -139,6 +139,7 @@ function getDataUnitY(){
     initGraph();
 }
 
+/* Control the slider responsible for the size of the data points */
 $(document).ready(function(){
     if(numericData === 1){
         $("#slider").slider({
