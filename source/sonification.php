@@ -61,7 +61,7 @@
                             <td>...</td>
                         </tr>
                     </table>
-                </div>  
+                </div>
             </div><br/>    
             <h4>Please select a .csv file:</h4>
             <div class="row">
@@ -102,9 +102,10 @@
                                 echo'<div class="col-md-6 text-justify">';
                                     echo '<h4>Instructions</h4>';
                                     echo '<ul>';
+                                       echo '<li>Please use headphones for a richer experience</li>';
                                        if($_SESSION["csvColsCnt"]>1){
                                         echo'<li>To explore <b>audification</b> and <b>parameter mapping</b>, first, select if you want to sonify all columns at once by pressing <b>Simultaneously</b>, or if you want to sonify consecutively column by column by pressing <b>Column at a time</b></li>';
-                                        echo'<li>Select the sonification technique using <b>Audification</b>, <b>Parameter mapping: frequency</b>, or <b>Parameter mapping: loudness</b> buttons, and the sound should start playing automatically</li>';
+                                        echo'<li>Select the sonification technique using <b>Audification</b>, <b>Parameter mapping: frequency</b>, <b>Parameter mapping: loudness</b>, or <b>Parameter mapping: space</b> buttons, and the sound should start playing automatically.</li>';
                                        }else{
                                         echo'<li>To explore <b>audification</b> and <b>parameter mapping</b>, first select the sonification technique using <b>Audification</b>, <b>Parameter mapping: frequency</b>, or <b>Parameter mapping: loudness</b> buttons, and the sound should start playing automatically</li>';
                                       
@@ -129,10 +130,11 @@
                                                 <button class = "btn btn-default soundflow" id = "columnwise"><div class="glyphicon glyphicon-sort-by-attributes-alt"></div> <br/>Column at a time</button>
                                               </div><br/><br/>'; //if data has more than 1 column/field
                                     }    
-                                    echo '<div class="btn-group">
-                                            <button id = "audification" class="btn btn-default sonification"> Audification: <br/>frequency</button>
-                                            <button id = "pm_frequency" class="btn btn-default sonification"> Parameter mapping: <br/>frequency </button>
-                                            <button id = "pm_loudness" class="btn btn-default sonification"> Parameter mapping: <br/>loudness </button>
+                                    echo '<div class="btn-group-vertical">
+                                            <button id = "audification" class="btn btn-default sonification">Audification: frequency</button>
+                                            <button id = "pm_frequency" class="btn btn-default sonification"> Parameter mapping: frequency </button>
+                                            <button id = "pm_loudness" class="btn btn-default sonification"> Parameter mapping: loudness </button>
+                                            <button id = "pm_space" class="btn btn-default sonification"> Parameter mapping: space </button>
                                           </div>
                                           <br/><br/>';
                                     echo '<div class="btn-toolbar" role="toolbar">';
@@ -189,7 +191,6 @@
                 }
             }   
         ?>
-    <div id="slider"></div>  
 <?php require_once 'footer.php';?>
 <!-- JQuery library, minified -->    
 <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
