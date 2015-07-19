@@ -12,7 +12,12 @@
     <div class="wrapper">
         <div class="animated-bg">
             <div class="container fluid">
-                <h1 class="text-center">Sonify</h1>
+                <h1 class="text-center">
+                    Sonify
+                    <br/>
+                    <small>Turn your data into sound</small>
+                </h1>
+                <br/>
                 <div class="row tile-row">
                     <div class="col-md-12 text-center beige tile">
                         <h3>What is this project about?</h3>

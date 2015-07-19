@@ -13,8 +13,9 @@
     </nav>
     <div class="wrapper ">
         <div class="container fluid">
-            <h1>Sonification</h1>
-            <h4>Supported browsers</h4>
+            <h1 class="text-center">Explore Sonification Techniques</h1>
+            <br/>
+            <h3>Supported browsers</h3>
             <div class="row">
                 <div class="col-md-2">
                     Desktop
@@ -36,10 +37,10 @@
             </div>
             <br/>
             <form action="upload.php" method="post" enctype="multipart/form-data">
-            <h4>Sample .csv data:</h4>
+            <h3>Sample .csv data:</h3>
             <div class="row">
                 <div class="col-md-6">
-                    <table border="1px solid black" width="50%">
+                    <table class="table table-striped table-bordered" width="50%">
                         <tr>
                             <th>heading1</th>
                             <th>heading2</th>
@@ -48,12 +49,12 @@
                         <tr>
                             <td>1</td>
                             <td>3</td>
-                            <td>5</td>
+                            <td>...</td>
                         </tr>
                         <tr>
                             <td>4</td>
                             <td>6</td>
-                            <td>7</td>
+                            <td>...</td>
                         </tr>
                         <tr>
                             <td>...</td>
@@ -63,17 +64,14 @@
                     </table>
                 </div>
             </div><br/>    
-            <h4>Please select a .csv file:</h4>
+            <h3>Please select a .csv file:</h3>
             <div class="row">
                 <div class="col-md-3"><h4><input type="file" name="csv" value="" /></h4></div>
                 <div class="col-md-3"><h4><input type="submit" name="submit" value="Upload" /></h4></div>
             </div>
             <div class="row">
-                <p class="col-md-12">*Please note that the file should contain numerical data only, and the top row should contain the field names</p>
-            </div>
-            <div class="row">
-                <div class="col-md-4"></div>
-                <div class="col-md-4">
+                <div class="col-md-3"></div>
+                <div class="col-md-6">
                     <?php 
                         if($_GET&&$_GET['err']){
                             if($_GET['err']==1){
@@ -85,6 +83,9 @@
                         echo '<div class="row" id = "topErrContainer"></div>';
                     ?>
                 </div>
+            </div>
+            <div class="row">
+                <p class="col-md-12">*Please note that the file should contain numerical data only, and the top row should contain the field names</p>
             </div>
             </form>
             </table>
@@ -98,13 +99,14 @@
                     echo '<div id="colCount" style="display:none">'.$_SESSION["csvColsCnt"].'</div>
                           <div id="rowCount" style="display:none">'.$_SESSION["csvRowsCnt"].'</div>'; 
                     echo '<div class="container fluid">';
-                          echo '<div class="row tile beige">';
+                          echo '<h3>Audification and Parameter Mapping</h3>
+                                <div class="row tile beige">';
                                 echo'<div class="col-md-6 text-justify">';
                                     echo '<h4>Instructions</h4>';
                                     echo '<ul>';
                                        echo '<li>Please use headphones for a richer experience</li>';
                                        if($_SESSION["csvColsCnt"]>1){
-                                        echo'<li>To explore <b>audification</b> and <b>parameter mapping</b>, first, select if you want to sonify all columns at once by pressing <b>Simultaneously</b>, or if you want to sonify consecutively column by column by pressing <b>Column at a time</b></li>';
+                                        echo'<li>To explore <b>audification</b> and <b>parameter mapping</b>, first, select if you want to sonify all columns at once by pressing <b>Simultaneously</b>. Alternatively, if you want to sonify consecutively, column by column - press <b>Column-wise</b>, or if you want to sonify row by row - select  <b>Row-wise</b></li>';
                                         echo'<li>Select the sonification technique using <b>Audification</b>, <b>Parameter mapping: frequency</b>, <b>Parameter mapping: loudness</b>, or <b>Parameter mapping: space</b> buttons, and the sound should start playing automatically.</li>';
                                        }else{
                                         echo'<li>To explore <b>audification</b> and <b>parameter mapping</b>, first select the sonification technique using <b>Audification</b>, <b>Parameter mapping: frequency</b>, or <b>Parameter mapping: loudness</b> buttons, and the sound should start playing automatically</li>';
@@ -127,7 +129,8 @@
                                     if($_SESSION["csvColsCnt"]>1){
                                         echo '<div class="btn-group">
                                                 <button class = "btn btn-default soundflow" id = "simultaneous"><div class="glyphicon glyphicon-random"></div> <br/>Simultaneously</button>
-                                                <button class = "btn btn-default soundflow" id = "columnwise"><div class="glyphicon glyphicon-sort-by-attributes-alt"></div> <br/>Column at a time</button>
+                                                <button class = "btn btn-default soundflow" id = "columnwise"><div class="glyphicon glyphicon-object-align-top"></div> <br/>Column-wise</button>
+                                                <button class = "btn btn-default soundflow" id = "rowwise"><div class="glyphicon glyphicon-object-align-bottom icon-rotated"></div> <br/>Row-wise</button>
                                               </div><br/><br/>'; //if data has more than 1 column/field
                                     }    
                                     echo '<div class="btn-group-vertical">
@@ -135,6 +138,7 @@
                                             <button id = "pm_frequency" class="btn btn-default sonification"> Parameter mapping: frequency </button>
                                             <button id = "pm_loudness" class="btn btn-default sonification"> Parameter mapping: loudness </button>
                                             <button id = "pm_space" class="btn btn-default sonification"> Parameter mapping: space </button>
+                                            <button id = "pm_frequency_space" class="btn btn-default sonification"> Parameter mapping: frequency and space </button>
                                           </div>
                                           <br/><br/>';
                                     echo '<div class="btn-toolbar" role="toolbar">';
@@ -164,7 +168,8 @@
                                     }
                                 echo '</div>';
                             echo '</div>';
-                            echo '<div class="row tile beige">
+                            echo '<h3>Model-Based Sonification</h3>
+                                  <div class="row tile beige">
                                     <div class="col-md-6">
                                         <h4>Instructions</h4>
                                         <ul><li>Every data point has a corresponding sound which can be played by <b>clicking on the data point</b></li>

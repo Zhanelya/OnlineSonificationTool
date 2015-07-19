@@ -10,8 +10,9 @@
            </ul>
         </nav>
     <div class="wrapper ">
-        <div class="container fluid">
-            <h1>Contact</h1>
+        <div class="container fluid text-center">
+            <h1 class="text-center">Contact</h1>
+            <br/>
             <p>Zhanelya Subebayeva </p>
             <p>MSc Computer Science, QMUL</p>
             <p>Email: subebo91@inbox.ru</p>

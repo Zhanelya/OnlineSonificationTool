@@ -76,6 +76,14 @@ nav{
     -ms-transform: scaleX(-1);
 }
 
+/* to rotate bootstrap icons 90deg clockwise (used for row-wise btn) */
+.icon-rotated {
+    transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+}
+
 #slider{
     margin-top:0.5em;
 }
