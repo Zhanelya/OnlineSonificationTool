@@ -107,9 +107,9 @@
                                        echo '<li>Please use headphones for a richer experience</li>';
                                        if($_SESSION["csvColsCnt"]>1){
                                         echo'<li>To explore <b>audification</b> and <b>parameter mapping</b>, first, select if you want to sonify all columns at once by pressing <b>Simultaneously</b>. Alternatively, if you want to sonify consecutively, column by column - press <b>Column-wise</b>, or if you want to sonify row by row - select  <b>Row-wise</b></li>';
-                                        echo'<li>Select the sonification technique using <b>Audification</b>, <b>Parameter mapping: frequency</b>, <b>Parameter mapping: loudness</b>, or <b>Parameter mapping: space</b> buttons, and the sound should start playing automatically.</li>';
+                                        echo'<li>Select the sonification technique using <b>Audification</b>, <b>Parameter mapping: frequency (pitch)</b>, <b>Parameter mapping: loudness</b>, <b>Parameter mapping: space</b>, or <b>Parameter mapping: space and frequency (pitch)</b> buttons, and the sound should start playing automatically.</li>';
                                        }else{
-                                        echo'<li>To explore <b>audification</b> and <b>parameter mapping</b>, first select the sonification technique using <b>Audification</b>, <b>Parameter mapping: frequency</b>, or <b>Parameter mapping: loudness</b> buttons, and the sound should start playing automatically</li>';
+                                        echo'<li>To explore <b>audification</b> and <b>parameter mapping</b>, first select the sonification technique using <b>Audification</b>, <b>Parameter mapping: frequency (pitch)</b>, <b>Parameter mapping: loudness</b>, <b>Parameter mapping: space</b>, or <b>Parameter mapping: space and frequency (pitch)</b> buttons, and the sound should start playing automatically</li>';
                                       
                                        }
                                        echo'<li><b>Pause</b> will pause the sound flow, <b>Play</b> will allow to resume, and <b>Stop</b> to stop</li>
@@ -134,11 +134,11 @@
                                               </div><br/><br/>'; //if data has more than 1 column/field
                                     }    
                                     echo '<div class="btn-group-vertical">
-                                            <button id = "audification" class="btn btn-default sonification">Audification: frequency</button>
-                                            <button id = "pm_frequency" class="btn btn-default sonification"> Parameter mapping: frequency </button>
+                                            <button id = "audification" class="btn btn-default sonification">Audification</button>
+                                            <button id = "pm_frequency" class="btn btn-default sonification"> Parameter mapping: frequency (pitch) </button>
                                             <button id = "pm_loudness" class="btn btn-default sonification"> Parameter mapping: loudness </button>
                                             <button id = "pm_space" class="btn btn-default sonification"> Parameter mapping: space </button>
-                                            <button id = "pm_frequency_space" class="btn btn-default sonification"> Parameter mapping: frequency and space </button>
+                                            <button id = "pm_frequency_space" class="btn btn-default sonification"> Parameter mapping: space and frequency (pitch) </button>
                                           </div>
                                           <br/><br/>';
                                     echo '<div class="btn-toolbar" role="toolbar">';
