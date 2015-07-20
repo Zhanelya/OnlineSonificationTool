@@ -130,6 +130,12 @@
                     </div>
                 </div>
                 <br/>
+                <div class="row tile-row">
+                    <div class="col-md-12 text-center">
+                        <a class="btn btn-lg btn-default btn-primary" href="sonification.php"><h4>OK, let's Sonify my data now</h4></a><br/>
+                        
+                    </div>
+                </div>
                 <div class="row text-center">
                     <div class="col-md-12">
                         <h3>Additional sources</h3>

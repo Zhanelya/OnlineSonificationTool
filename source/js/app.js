@@ -6,10 +6,17 @@ var base_a4 = 440; // set A4=440Hz
 var minFreq = 440; // min frequency
 var maxFreq = 1200; // set max frequency (frequency may still take higher values due to offset)
 var freqDifference = 50; // to ease distinguishing columns in PM using loudness
+
+var soundLoudness = 0.5; //default single sound loudness
 var minLoudness = 0.1; // set min loudness 
 var maxLoudness = 1.0; // set max loudness (loudness may still take higher values due to offset)
-var soundLoudness = 0.5; //default single sound loudness
+
 var soundDuration = 500; //default single sound duration
+var singleSpeedDuration = 600; //default single sound duration for normal speed
+var doubleSpeedDuration = 300; //default single sound duration for double speed (e.g. fast forward)
+var minDuration = 50; // set min duration 
+var maxDuration = 300; // set max duration
+
 var waveshapes = ["sine","triangle","sawtooth","square"]; //differentiate waveforms
 
 var play = true; //flag for play/pause
@@ -56,6 +63,9 @@ function start(){
     $("#pm_frequency").click(function(){
         activateSonificationBtn('pm_frequency');
     });
+    $("#pm_duration").click(function(){
+        activateSonificationBtn('pm_duration');
+    });
     $("#pm_loudness").click(function(){
         activateSonificationBtn('pm_loudness');
     });
@@ -70,7 +80,7 @@ function start(){
         
         reverse = false;
         play = true;
-        soundDuration = 500;
+        soundDuration = singleSpeedDuration;
         resumeSoundPattern();
     });
     $('#pause').click(function(){
@@ -88,7 +98,7 @@ function start(){
         
         reverse = true;
         play = true;
-        soundDuration = 500;
+        soundDuration = singleSpeedDuration;
         resumeSoundPattern();
     });
     $('#bwd').click(function(){
@@ -96,7 +106,7 @@ function start(){
         
         reverse = true;
         play = true;
-        soundDuration = 250;
+        soundDuration = doubleSpeedDuration;
         resumeSoundPattern();
     });
     $('#fwd').click(function(){
@@ -104,7 +114,7 @@ function start(){
         
         reverse = false;
         play = true;
-        soundDuration = 250;
+        soundDuration = doubleSpeedDuration;
         resumeSoundPattern();
     });
     $('#repeat').click(function(){
@@ -203,7 +213,7 @@ function activateSonificationBtn(btn){
         $('#'+btn).addClass('active');
         activateControlsBtn('play');
         
-        soundDuration = 500;
+        soundDuration = singleSpeedDuration;
         reverse = false;
         clearTimeoutsQueue();
         initScheduledSounds();
@@ -241,7 +251,7 @@ function clearBtns(){
     $('#repeat').removeClass('active');
     
     //set sound Duration back to default
-    soundDuration = 500;
+    soundDuration = singleSpeedDuration;
 }   
 
 /* Clear js events queue, which is triggering sounds */
@@ -271,6 +281,15 @@ function audification(){
 function pm_frequency(){
     play = true;
     scheduled[data.colCount]='pm_frequency';
+    //offset if the value is below or above reasonable hearable range
+    offset = calculateOffsetPM();
+    playSoundPattern(offset);
+}
+
+/* Parameter mapping - frequency */
+function pm_duration(){
+    play = true;
+    scheduled[data.colCount]='pm_duration';
     //offset if the value is below or above reasonable hearable range
     offset = calculateOffsetPM();
     playSoundPattern(offset);
@@ -328,6 +347,9 @@ function calculateOffsetPM(){
        scheduled[data.colCount]==='pm_frequency_space'){
         maxParam = maxFreq;
         minParam = minFreq;
+    }else if(scheduled[data.colCount]==='pm_duration'){
+        maxParam = maxDuration;
+        minParam = minDuration;
     }else if(scheduled[data.colCount]==='pm_loudness'){
         maxParam = maxLoudness;
         minParam = minLoudness;
@@ -363,21 +385,25 @@ function playSoundPattern(offset){
                         var freq = element + offset;
                         var val = {value:element,freq:freq};
                     }else if(scheduled[data.colCount]==='pm_frequency'){
-                        var freq = closestMidi((element/data.max) * maxFreq + offset);
+                        var freq = closestMidi((element/data.max) * maxFreq + offset); //mapping to frequency
                         var val = {value:element,freq:freq};
-                    }else if(scheduled[data.colCount]==='pm_loudness'){
-                        var loudness = (element/data.max) * maxLoudness + offset;
+                    }else if(scheduled[data.colCount]==='pm_duration'){
+                        var duration = (element/data.max) * maxDuration + offset; //mapping to duration
+                        var freqOffset = freqDifference*colNo;
+                        var val = {value:element,freqOffset:freqOffset,duration:duration};
+                    }else if(scheduled[data.colCount]==='pm_loudness'){ 
+                        var loudness = (element/data.max) * maxLoudness + offset; //mapping to loudness
                         var freqOffset = freqDifference*colNo;
                         var val = {value:element,freqOffset:freqOffset,loudness:loudness};
                     }else if(scheduled[data.colCount]==='pm_space'){
-                        var panningX= (element/data.max*20) -10; 
+                        var panningX= (element/data.max*20) -10; //mapping to panning
                         ////range of panning is from -10 to +10, hence 20,
                         //offset is -10 to set it alternating around 0
                         var freqOffset = freqDifference*colNo;
                         var val = {value:element,freqOffset:freqOffset, panningX:panningX};
                     }else if(scheduled[data.colCount]==='pm_frequency_space'){
-                        var panningX= (element/data.max*20) -10; 
-                        var freq = closestMidi((element/data.max) * maxFreq + offset);
+                        var panningX= (element/data.max*20) -10; //mapping to panninf
+                        var freq = closestMidi((element/data.max) * maxFreq + offset); //mapping to frequency
                         var val = {value:element,freq:freq, panningX:panningX};
                     } 
                     scheduled[colNo].push(val); //add sound to schedule   
@@ -427,6 +453,8 @@ function sonifySound(colNo){
         if(scheduled[data.colCount]==='pm_frequency'||
             scheduled[data.colCount]==='audification'){
             playSound(colNo,playVal.freq,soundLoudness);
+        }else if(scheduled[data.colCount]==='pm_duration'){
+            playSound(colNo,playVal.freqOffset,soundLoudness,0,playVal.duration); 
         }else if(scheduled[data.colCount]==='pm_loudness'){
             playSound(colNo,playVal.freqOffset,playVal.loudness); 
         }else if(scheduled[data.colCount]==='pm_space'){
@@ -536,19 +564,20 @@ function finishRow(){
 ** Spectra and Envelope affect timbre 
 ** Spectra is controlled by Oscillator wave type (shape) 
 ** Envelope is controlled by attack, sustain and decay */ 
-function playSound(colNo, freq, loudness, panningX){
+function playSound(colNo, freq, loudness, panningX, duration){
     panningX = typeof panningX !== 'undefined' ? panningX : 0; //set default param value
+    duration = typeof duration !== 'undefined' ? duration : soundDuration; //set default param value
     
     var c = (colNo+1)/data.colCount;
 
-    var attack = c*soundDuration*1/4,
-        sustain = c*soundDuration*3/4,
-        decay = soundDuration,
+    var attack = c*duration*1/4,
+        sustain = c*duration*3/4,
+        decay = duration,
         
         gain = audioCtx.createGain(), 
         osc = audioCtx.createOscillator(),
         panner = audioCtx.createPanner(); 
-    
+    console.log(attack+ ' '+sustain+' '+decay);
     if(!columnwise){loudness = loudness/(scheduled.length-1);}
     //set loudness (#column times) lower if all columns are played simultaneously
                                     
@@ -563,7 +592,8 @@ function playSound(colNo, freq, loudness, panningX){
        scheduled[data.colCount]==='pm_frequency_space'){
         osc.frequency.value = freq;
     }else if(scheduled[data.colCount]==='pm_loudness'||
-        scheduled[data.colCount]==='pm_space'){
+        scheduled[data.colCount]==='pm_space'||
+        scheduled[data.colCount]==='pm_duration'){
         osc.frequency.value = base_a4 + freq; //set frequency to default and add offset (freq) to differentiate columns
     }
     
@@ -576,6 +606,7 @@ function playSound(colNo, freq, loudness, panningX){
         panner.setPosition(panningX,1,1);
     }else if(scheduled[data.colCount]==='pm_loudness'||
             scheduled[data.colCount]==='pm_frequency'||
+            scheduled[data.colCount]==='pm_duration'||
             scheduled[data.colCount]==='audification'){
         osc.connect(gain);
     }
@@ -583,17 +614,16 @@ function playSound(colNo, freq, loudness, panningX){
     
     setTimeout(function() { 
         osc.stop(0);
-        try{
-            if (scheduled[data.colCount]==='pm_space'||
-                scheduled[data.colCount]==='pm_frequency_s[ace'){
-                osc.disconnect(panner);
-                 panner.disconnect(gain);
-            }else if(scheduled[data.colCount]==='pm_loudness'||
-                scheduled[data.colCount]==='pm_frequency'||
-                scheduled[data.colCount]==='audification'){
-                 osc.disconnect(gain);
-            }
-        }catch(e){}
+        if (scheduled[data.colCount]==='pm_space'||
+            scheduled[data.colCount]==='pm_frequency_space'){
+            panner.disconnect(gain);
+            osc.disconnect(panner);
+        }else if(scheduled[data.colCount]==='pm_loudness'||
+            scheduled[data.colCount]==='pm_frequency'||
+            scheduled[data.colCount]==='pm_duration'||
+            scheduled[data.colCount]==='audification'){
+             osc.disconnect(gain);
+        }
         gain.disconnect(audioCtx.destination);
-    }, soundDuration);
+    }, duration);
 }
