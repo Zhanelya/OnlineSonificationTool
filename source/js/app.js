@@ -11,11 +11,10 @@ var soundLoudness = 0.5; //default single sound loudness
 var minLoudness = 0.1; // set min loudness 
 var maxLoudness = 1.0; // set max loudness (loudness may still take higher values due to offset)
 
-var soundDuration = 500; //default single sound duration
-var singleSpeedDuration = 600; //default single sound duration for normal speed
-var doubleSpeedDuration = 300; //default single sound duration for double speed (e.g. fast forward)
+var soundDuration = 700; //default single sound duration
+var singleSpeedDuration = 700; //default single sound duration for normal speed
+var doubleSpeedDuration = 350; //default single sound duration for double speed (e.g. fast forward)
 var minDuration = 50; // set min duration 
-var maxDuration = 300; // set max duration
 
 var waveshapes = ["sine","triangle","sawtooth","square"]; //differentiate waveforms
 
@@ -348,7 +347,7 @@ function calculateOffsetPM(){
         maxParam = maxFreq;
         minParam = minFreq;
     }else if(scheduled[data.colCount]==='pm_duration'){
-        maxParam = maxDuration;
+        maxParam = soundDuration;
         minParam = minDuration;
     }else if(scheduled[data.colCount]==='pm_loudness'){
         maxParam = maxLoudness;
@@ -388,7 +387,7 @@ function playSoundPattern(offset){
                         var freq = closestMidi((element/data.max) * maxFreq + offset); //mapping to frequency
                         var val = {value:element,freq:freq};
                     }else if(scheduled[data.colCount]==='pm_duration'){
-                        var duration = (element/data.max) * maxDuration + offset; //mapping to duration
+                        var duration = (element/data.max) * soundDuration + offset; //mapping to duration
                         var freqOffset = freqDifference*colNo;
                         var val = {value:element,freqOffset:freqOffset,duration:duration};
                     }else if(scheduled[data.colCount]==='pm_loudness'){ 
@@ -577,7 +576,6 @@ function playSound(colNo, freq, loudness, panningX, duration){
         gain = audioCtx.createGain(), 
         osc = audioCtx.createOscillator(),
         panner = audioCtx.createPanner(); 
-    console.log(attack+ ' '+sustain+' '+decay);
     if(!columnwise){loudness = loudness/(scheduled.length-1);}
     //set loudness (#column times) lower if all columns are played simultaneously
                                     
