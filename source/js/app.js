@@ -22,8 +22,8 @@ var play = true; //flag for play/pause
 var reverse = false; //flag for reversed play
 var timeouts = []; //store timeouts (to allow stop button clear scheduled sounds)
 var repeat = 0; //flag for looping on/off
-var columnwise = 0; //flag for columnwise data flow
-var rowwise = 0; //flag for rowwise data flow
+var columnwise = 0; //flag for column-wise data flow
+var rowwise = 0; //flag for row-wise data flow
 var scheduled = []; //store sounds scheduled to play (to enable pause/play)
 
 var numericData; //flag to check if all data is numeric
@@ -415,6 +415,15 @@ function playSoundPattern(offset){
                             if(!repeat && finished()){clearBtns();} 
                         }
                     }, t));
+                    /* generate click sounds for row-wise/column-wise sonification */
+                    if((columnwise && (k === colData.length-1))|| //reached last column in row-wise sonification
+                       (rowwise && (i === data.colCount-1))){ //reached last row in column-wise sonification
+                        timeouts.push(setTimeout(function() { 
+                            if(play === true) {
+                                playClickSound();
+                            }
+                        }, t+soundDuration));
+                    }
                 })(k);
             }
         } 
@@ -422,6 +431,17 @@ function playSoundPattern(offset){
         $('#errContainer').append('<div class="col-md-12 err">Error. Please upload a file with numerical data</div>');
     }
 }
+/* Calculate the time needed for a click sound */
+function calculateClickTime(colNo,rowNo){
+    var clickTime = 0;
+    if(columnwise){
+        clickTime = soundDuration*colNo;
+    }else if(rowwise){
+        clickTime = soundDuration*rowNo;
+    }
+    return clickTime;
+}
+
 /* Calculate timelapse before every sound is played */
 function calculateTimeout(colNo,rowNo){
     var t = 0;
@@ -432,7 +452,7 @@ function calculateTimeout(colNo,rowNo){
     }else if(rowwise){
         t = ((rowNo*data.colCount) + colNo) * soundDuration; //play values from the 1st row for every column, then start the next row
     }  
-    return t;
+    return t + calculateClickTime(colNo,rowNo);
 }
 
 /* Get sound parameters from the queue of sounds,
@@ -530,6 +550,15 @@ function resumeSoundPattern(){
                             if(!repeat && finished()){clearBtns();}  
                         }
                     }, t));
+                    /* generate click sounds for row-wise/column-wise sonification */
+                    if((columnwise && (k === colData.length-1))|| //reached last column in row-wise sonification
+                       (rowwise && (i === data.colCount-1))){ //reached last row in column-wise sonification
+                        timeouts.push(setTimeout(function() { 
+                            if(play === true) {
+                                playClickSound();
+                            }
+                        }, t+soundDuration));
+                    }
                 })(k);
             }
         }
@@ -546,12 +575,22 @@ function finishRow(){
                 timeToFinishRow += soundDuration;
                 (function(){
                     var colNo = j;
+                    var t = (colNo-(i+1))*soundDuration;
                     //play scheduled from the unfinished row
                     timeouts.push(setTimeout(function() { 
                         if(play === true) {
                             sonifySound(colNo);
                         }
-                    }, (colNo-(i+1))*soundDuration));
+                    }, t));
+                    /* generate click sounds for row-wise sonification */
+                    if(j === data.colCount-1){ //reached last row in column-wise sonification
+                        timeToFinishRow += soundDuration;
+                        timeouts.push(setTimeout(function() { 
+                            if(play === true) {
+                                playClickSound();
+                            }
+                        }, t+soundDuration));
+                    }
                 })(j);  
             }
         }
@@ -624,4 +663,26 @@ function playSound(colNo, freq, loudness, panningX, duration){
         }
         gain.disconnect(audioCtx.destination);
     }, duration);
+}
+
+/* Play a click sound to make the end of row/column 
+ * distinguishable in row and column-wise sonification*/
+function playClickSound(){
+    var gain = audioCtx.createGain(), 
+        osc = audioCtx.createOscillator();
+    gain.connect(audioCtx.destination);
+    osc.connect(gain);
+    
+    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+    gain.gain.setValueAtTime(1.8, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+    
+    osc.start(0);
+   
+    setTimeout(function() { 
+        osc.stop(0);
+        osc.disconnect(gain);
+        gain.disconnect(audioCtx.destination);
+    }, soundDuration);
 }
