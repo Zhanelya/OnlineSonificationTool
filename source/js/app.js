@@ -7,9 +7,10 @@ var minFreq = 440; // min frequency
 var maxFreq = 1200; // set max frequency (frequency may still take higher values due to offset)
 var freqDifference = 50; // to ease distinguishing columns in PM using loudness
 
-var soundLoudness = 0.5; //default single sound loudness
-var minLoudness = 0.1; // set min loudness 
-var maxLoudness = 1.0; // set max loudness (loudness may still take higher values due to offset)
+var soundLoudness = 0.8; //default single sound loudness
+var minLoudness = 0.16; // set min loudness 
+var maxLoudness = 1.6; // set max loudness (loudness may still take higher values due to offset)
+var soundStep = 0.2; //step by which a user can increase/decrease the loudness
 
 var soundDuration = 700; //default single sound duration
 var singleSpeedDuration = 700; //default single sound duration for normal speed
@@ -142,6 +143,29 @@ function start(){
        columnwise = 0;
        $('#stop').click();
        activateSoundFlowBtn('rowwise');
+    });
+    $('#volume-off').click(function(){ //mute sound
+            soundLoudness = 0;
+            minLoudness = 0;
+            maxLoudness = 0;
+    });
+    $('#volume-down').click(function(){
+       if((soundLoudness - soundStep)/5 > 0.001){ //if minimum loudness > minimum appropriate loudness
+            soundLoudness -= soundStep;
+            minLoudness = soundLoudness / 5;
+            maxLoudness = soundLoudness * 2;
+       }else{
+            $('#errContainer').append('<div class="col-md-12 err">You have reached minimum loudness</div>');
+       }
+    });
+    $('#volume-up').click(function(){
+       if((soundLoudness + soundStep)*2 < 3){ //if maximum loudness < maximum appropriate loudness
+            soundLoudness += soundStep;
+            minLoudness = soundLoudness / 5;
+            maxLoudness = soundLoudness * 2;
+       }else{
+            $('#errContainer').append('<div class="col-md-12 err">You have reached maximum loudness</div>');
+       }
     });
 }
 
@@ -391,9 +415,8 @@ function playSoundPattern(offset){
                         var freqOffset = freqDifference*colNo;
                         var val = {value:element,freqOffset:freqOffset,duration:duration};
                     }else if(scheduled[data.colCount]==='pm_loudness'){ 
-                        var loudness = (element/data.max) * maxLoudness + offset; //mapping to loudness
                         var freqOffset = freqDifference*colNo;
-                        var val = {value:element,freqOffset:freqOffset,loudness:loudness};
+                        var val = {value:element,offset:offset,freqOffset:freqOffset};
                     }else if(scheduled[data.colCount]==='pm_space'){
                         var panningX= (element/data.max*20) -10; //mapping to panning
                         ////range of panning is from -10 to +10, hence 20,
@@ -475,7 +498,10 @@ function sonifySound(colNo){
         }else if(scheduled[data.colCount]==='pm_duration'){
             playSound(colNo,playVal.freqOffset,soundLoudness,0,playVal.duration); 
         }else if(scheduled[data.colCount]==='pm_loudness'){
-            playSound(colNo,playVal.freqOffset,playVal.loudness); 
+            if(maxLoudness !== 0){
+                var loudness = (playVal.value/data.max) * maxLoudness + playVal.offset; //mapping to loudness
+                playSound(colNo,playVal.freqOffset,loudness); 
+            }
         }else if(scheduled[data.colCount]==='pm_space'){
             playSound(colNo,playVal.freqOffset,soundLoudness,playVal.panningX); 
         }else if(scheduled[data.colCount]==='pm_frequency_space'){
@@ -668,21 +694,23 @@ function playSound(colNo, freq, loudness, panningX, duration){
 /* Play a click sound to make the end of row/column 
  * distinguishable in row and column-wise sonification*/
 function playClickSound(){
-    var gain = audioCtx.createGain(), 
-        osc = audioCtx.createOscillator();
-    gain.connect(audioCtx.destination);
-    osc.connect(gain);
-    
-    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-    gain.gain.setValueAtTime(1.8, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-    
-    osc.start(0);
-   
-    setTimeout(function() { 
-        osc.stop(0);
-        osc.disconnect(gain);
-        gain.disconnect(audioCtx.destination);
-    }, soundDuration);
+    if(maxLoudness !== 0){ //if the volume is on
+        var gain = audioCtx.createGain(), 
+            osc = audioCtx.createOscillator();
+        gain.connect(audioCtx.destination);
+        osc.connect(gain);
+
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        gain.gain.setValueAtTime(maxLoudness * 1.5, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(maxLoudness/100, audioCtx.currentTime + 0.1);
+        gain.gain.exponentialRampToValueAtTime(maxLoudness/100, audioCtx.currentTime + 0.1);
+
+        osc.start(0);
+
+        setTimeout(function() { 
+            osc.stop(0);
+            osc.disconnect(gain);
+            gain.disconnect(audioCtx.destination);
+        }, soundDuration);
+    }
 }

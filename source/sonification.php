@@ -152,7 +152,12 @@
                                                 <button class = "btn btn-default controls" id = "fwd"><div class="glyphicon glyphicon-forward"></div><br/> Forward </button>
                                                 ';
                                         echo '</div>';
-                                        echo '<button class = "btn btn-default" id = "repeat"><div class="glyphicon glyphicon-repeat"></div> <br/>Repeat</button>';
+                                        echo '<button class = "btn btn-default" id = "repeat"><div class="glyphicon glyphicon-repeat"></div> <br/>Repeat</button><br/><br/>';
+                                        echo '<div class=btn-group> 
+                                                <button id = "volume-off" class="btn btn-default volume"><div class="glyphicon glyphicon-volume-off"></div><br/>Volume <br/>off</button>
+                                                <button id = "volume-down" class="btn btn-default volume"><div class="glyphicon glyphicon-volume-down"></div><br/> Volume <br/>down </button>
+                                                <button id = "volume-up" class="btn btn-default volume"><div class="glyphicon glyphicon-volume-up"></div><br/> Volume <br/>up </button>
+                                              </div>';
                                     echo '</div>';    
                                     echo '<div class="row" id = "errContainer"></div>';
                                     for($i=0; $i<count($_SESSION["csvArr"]);$i++){
