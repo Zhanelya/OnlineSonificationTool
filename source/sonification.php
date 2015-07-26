@@ -117,6 +117,7 @@
                                             <li><b>Backward</b> will play the sound in reverse with double speed</li>
                                             <li><b>Forward</b> will simply play the sound with double speed</li>
                                             <li><b>Repeat</b> will enable repeat of the sound flow, which will be put in a loop until you press <b>Repeat</b> again or <b>Stop</b></li>
+                                            <li><b>Volume off</b>, <b>Volume down</b>, and <b>Volume up</b> allow to control the loudness of the sound flow</li>
                                             <li>Leaving the tab while the sound is playing will pause the sound flow</li>';
                                             if($_SESSION["csvColsCnt"]>1){
                                                 echo'<li>Changing between simultaneous (<b>Simultaneously</b>) and columnwise (<b>Column at a time</b>) sonification while the sound is playing will cause the current sonification flow to stop, and you will be asked to choose the technique of sonification again</li>';
