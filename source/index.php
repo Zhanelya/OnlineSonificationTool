@@ -1,21 +1,23 @@
 <?php 
     /* Zhanelya Subebayeva */
-    require_once 'header.php'
-;?>
+    require_once 'header.php';
+?>
     <nav class="navbar navbar-inverse">
            <ul class="nav navbar-nav">
                <li class="active"><a href="index.php"><h4>Home</h4></a></li>
                <li><a href="sonification.php"><h4>Sonification</h4></a></li>
+               <li><a href="video.php"><h4>Video</h4></a></li>
                <li><a href="contact.php"><h4>Contact</h4></a></li>
            </ul>
         </nav>
     <div class="wrapper">
         <div class="animated-bg">
             <div class="container fluid">
-                <h1 class="text-center">
-                    Sonify
-                    <br/>
-                    <small>Turn your data into sound</small>
+                <h1 class="text-center">DatSon<br/>
+                    <small> 
+                        - Online Tool for data sonification -<br/>
+                        Turn your data into sound
+                    </small>
                 </h1>
                 <br/>
                 <div class="row tile-row">

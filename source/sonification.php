@@ -8,12 +8,15 @@
            <ul class="nav navbar-nav">
                <li><a href="index.php"><h4>Home</h4></a></li>
                <li class="active"><a href="sonification.php"><h4>Sonification</h4></a></li>
+               <li><a href="video.php"><h4>Video</h4></a></li>
                <li><a href="contact.php"><h4>Contact</h4></a></li>
            </ul>
     </nav>
     <div class="wrapper ">
         <div class="container fluid">
-            <h1 class="text-center">Explore Sonification Techniques</h1>
+            <h1 class="text-center">Sonification<br/>
+                <small>Explore Sonification Techniques</small>
+            </h1>
             <br/>
             <h3>Supported browsers</h3>
             <div class="row">
