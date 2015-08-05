@@ -115,7 +115,8 @@
                                         echo'<li>To explore <b>audification</b> and <b>parameter mapping</b>, first select the sonification technique using <b>Audification</b>, <b>Parameter mapping: frequency (pitch)</b>, <b>Parameter mapping: duration</b>, <b>Parameter mapping: loudness</b>, <b>Parameter mapping: space</b>, or <b>Parameter mapping: space and frequency (pitch)</b> buttons, and the sound should start playing automatically</li>';
                                       
                                        }
-                                       echo'<li><b>Pause</b> will pause the sound flow, <b>Play</b> will allow to resume, and <b>Stop</b> to stop</li>
+                                       echo'<li>Reversed polarity will reverse the sonification mapping currently in use by mapping highs to lows and lows to highs</li>
+                                            <li><b>Pause</b> will pause the sound flow, <b>Play</b> will allow to resume, and <b>Stop</b> to stop</li>
                                             <li><b>Reverse</b> will play the sound in reverse</li>
                                             <li><b>Backward</b> will play the sound in reverse with double speed</li>
                                             <li><b>Forward</b> will simply play the sound with double speed</li>

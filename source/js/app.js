@@ -273,7 +273,7 @@ function activateSonificationBtn(btn) {
 
         eval(btn + "()"); //call the function corresponding to sonification technique
     } else {
-        $('#errContainer').append('<div class="col-md-12 err">Error. Please choose simultaneous or columnwise sonification</div>');
+        $('#errContainer').append('<div class="col-md-12 err">Error. Please choose simultaneous, column-wise or row-wise sonification</div>');
     }
 }
 
