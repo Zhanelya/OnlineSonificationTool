@@ -144,8 +144,14 @@
                                             <button id = "pm_loudness" class="btn btn-default sonification"> Parameter mapping: loudness </button>
                                             <button id = "pm_space" class="btn btn-default sonification"> Parameter mapping: space </button>
                                             <button id = "pm_frequency_space" class="btn btn-default sonification"> Parameter mapping: space and frequency (pitch) </button>
+                                            <button id = "pm_frequency_rpolarity" class="btn btn-default sonification"> Parameter mapping: frequency (pitch) - reversed polarity </button>
+                                            <button id = "pm_duration_rpolarity" class="btn btn-default sonification"> Parameter mapping: duration - reversed polarity </button>
+                                            <button id = "pm_loudness_rpolarity" class="btn btn-default sonification"> Parameter mapping: loudness - reversed polarity </button>
+                                            <button id = "pm_space_rpolarity" class="btn btn-default sonification"> Parameter mapping: space - reversed polarity </button>
+                                            <button id = "pm_frequency_space_rpolarity" class="btn btn-default sonification"> Parameter mapping: space and frequency (pitch) - reversed polarity </button>
                                           </div>
                                           <br/><br/>';
+                                    echo '<div class="row" id = "errContainer"></div>';
                                     echo '<div class="btn-toolbar" role="toolbar">';
                                         echo '<div class=btn-group> 
                                                 <button class = "btn btn-default controls" id = "pause"><div class="glyphicon glyphicon-pause"></div><br/> Pause </button>
@@ -163,7 +169,6 @@
                                                 <button id = "volume-up" class="btn btn-default volume"><div class="glyphicon glyphicon-volume-up"></div><br/> Volume <br/>up </button>
                                               </div>';
                                     echo '</div>';    
-                                    echo '<div class="row" id = "errContainer"></div>';
                                     for($i=0; $i<count($_SESSION["csvArr"]);$i++){
                                         $row = $_SESSION["csvArr"][$i];
                                         echo '<div class="row">';
