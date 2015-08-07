@@ -459,11 +459,9 @@ function calculateOffsetPM() {
             possibleVal = (colMin / data.max) * maxParam[key];
             if (possibleVal < possibleMin[key])
                 possibleMin[key] = possibleVal;
-            console.log(possibleMin[key]);
         }
         offset[key] = minParam[key] - possibleMin[key];
     }
-    console.log(offset);
     return offset;
 }
 
