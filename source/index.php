@@ -15,7 +15,7 @@
             <div class="container fluid">
                 <h1 class="text-center">DatSon<br/>
                     <small> 
-                        - Online Tool for data sonification -<br/>
+                        - Online Tool for Data Sonification -<br/>
                         Turn your data into sound
                     </small>
                 </h1>

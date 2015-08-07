@@ -88,7 +88,7 @@
                 </div>
             </div>
             <div class="row">
-                <p class="col-md-12">*Please note that the file should contain numerical data only, and the top row should contain the field names</p>
+                <p class="col-md-12">*Please note that the file should contain comma-separated numerical data only, and the top row should contain the field names, separated by commas</p>
             </div>
             </form>
             </table>
