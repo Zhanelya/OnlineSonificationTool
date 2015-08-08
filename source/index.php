@@ -67,6 +67,7 @@
                         </p>
                     </div> 
                 </div>
+                <h4 class="text-center">Techniques for sound design in the interface</h4><br/>
                 <div class="row">     
                     <div class="col-md-4 tile-col">
                         <ul>
@@ -77,18 +78,6 @@
                                 </p>
                                 <p>
                                     Earcons are easy to construct and produce on most of machines with already existing audio manipulation tools. They help to represent abstractly any object, as they are not obliged to correspond to the concepts that are represented by them (Barrass ans Kramer, 1999). On the other side, earcons are relatively difficult to learn, as they are illustrated by purely symbolic sounds; the more earcons are added, the slower the learning process becomes.
-                                </p>
-                            </div>
-                            <div class="row tile blue">
-                                <li><h4>Audification</h4></li>
-                                <p>
-                                    Audification is a direct conversion of data waveform into sound (McGee, 2009). 
-                                </p>
-                                <p>
-                                    Principal stages of audification are data acquisition (recording of sound), signal conditioning (audio signal processing) and sound projection/playback (Dombois and Eckel, 2011). It is also important to consider that the frequencies of the data representation must fit the audible range of 20Hz-22KHz (McGee, 2009).
-                                </p>
-                                <p>
-                                    This method is effectively used in seismology where the vibrations frequency is sped up to match the audible range (Hayward, 1994). This technique is also very useful in medicine, for instance stethoscope is one of the examples of early audifications; and audification of EEG and heart rate variability is becoming popular too (Dombois and Eckel, 2011).
                                 </p>
                             </div>
                     </div>    
@@ -102,6 +91,33 @@
                                 One of the advantages of auditory icons is the familiarity with everyday sounds, which makes their understanding much more intuitive. Apart from that, these real life sounds can be directly mapped considering their length or any other parameters. The main complexity of using auditory icons is mapping from pure mechanical events into virtual interface events (Barrass and Kramer, 1999). Apart from that, even though auditory icons production is a relatively trivial process, it puts a significant limit on the range of what can be represented by sound, as it is narrowed  down to only familiar sounds.
                             </p>
                         </div>
+                    </div>    
+                    <div class="col-md-4 tile-col">
+                        <div class="row tile red">
+                            <li><h4>Spearcons</h4></li>
+                            <p>
+                                Spearcons are similar to earcons and auditory icons. They are usually derived from spoken phrases, where the speed of the speech is sped up up to the point when they do not resemble speech any more (McGee, 2009). Auditory menus is an example usage of spearcons, where the menu text (for instance, “Save” or “Export File”) is converted to speech with text-to-speech software and then sped up, creating unique spearcons for each specific menu option, improving usability and performance of the interface (Walker et al., 2013).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="text-center">Techniques for data sonification</h4><br/>
+                <div class="row">
+                    <div class="col-md-4 tile-col">  
+                        <div class="row tile blue">
+                            <li><h4>Audification</h4></li>
+                            <p>
+                                Audification is a direct conversion of data waveform into sound (McGee, 2009). 
+                            </p>
+                            <p>
+                                Principal stages of audification are data acquisition (recording of sound), signal conditioning (audio signal processing) and sound projection/playback (Dombois and Eckel, 2011). It is also important to consider that the frequencies of the data representation must fit the audible range of 20Hz-22KHz (McGee, 2009).
+                            </p>
+                            <p>
+                                This method is effectively used in seismology where the vibrations frequency is sped up to match the audible range (Hayward, 1994). This technique is also very useful in medicine, for instance stethoscope is one of the examples of early audifications; and audification of EEG and heart rate variability is becoming popular too (Dombois and Eckel, 2011).
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 tile-col">
                         <div class="row tile orange">
                             <li><h4>Parameter mapping</h4></li>
                             <p>
@@ -111,14 +127,8 @@
                                 Parameter mapping is considered to be the most popular approach of data sonification (Barrass ans Kramer, 1999). Parameter mapping is relatively easy to produce, as it is possible to construct mappings to the variety of auditory parameters with already existing tools.
                             </p>
                         </div>
-                    </div>    
+                    </div>
                     <div class="col-md-4 tile-col">
-                        <div class="row tile red">
-                            <li><h4>Spearcons</h4></li>
-                            <p>
-                                Spearcons are similar to earcons and auditory icons. They are usually derived from spoken phrases, where the speed of the speech is sped up up to the point when they do not resemble speech any more (McGee, 2009). Auditory menus is an example usage of spearcons, where the menu text (for instance, “Save” or “Export File”) is converted to speech with text-to-speech software and then sped up, creating unique spearcons for each specific menu option, improving usability and performance of the interface (Walker et al., 2013).
-                            </p>
-                        </div>
                         <div class="row tile pink">
                             <li><h4>Model-Based Sonification</h4></li>
                             <p>
