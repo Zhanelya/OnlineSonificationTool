@@ -54,7 +54,7 @@
                                 Data sonification can be used for data analysis, such as financial data analysis and medical observations; data representation; data mining; pattern detection; perception of multiple data streams in parallel; in mobile devices; for reducing cognitive load, as ears fatigue more slowly than eyes (McGee, 2009); etc.
                             </p>
                             <p>
-                                Sonification is also used in scientific visualisations, engineering analyses, aircraft cockpits and emergency services (Barrass ans Kramer, 1999).
+                                Sonification is also used in scientific visualisations, engineering analyses, aircraft cockpits and emergency services (Barrass and Kramer, 1999).
                             </p> 
                         </div>
                     </div>    
@@ -77,7 +77,7 @@
                                     By earcons is understood any short musical motif using musical tones (Blattner et al., 1989). Their initial purpose was to provide feedback in a GUI (graphical user interface), for instance for signifying the completion of certain tasks. Earcons are formed with a lexicon of primitive sounds, which when combined together can produce more sophisticated meaning. An example of this can be setting a certain level of pitch, timbre or register equivalent to some concept or action, such as “file” or “deleted”, where the latter two can be combined together (Blattner et al., 1989). 
                                 </p>
                                 <p>
-                                    Earcons are easy to construct and produce on most of machines with already existing audio manipulation tools. They help to represent abstractly any object, as they are not obliged to correspond to the concepts that are represented by them (Barrass ans Kramer, 1999). On the other side, earcons are relatively difficult to learn, as they are illustrated by purely symbolic sounds; the more earcons are added, the slower the learning process becomes.
+                                    Earcons are easy to construct and produce on most of machines with already existing audio manipulation tools. They help to represent abstractly any object, as they are not obliged to correspond to the concepts that are represented by them (Barrass and Kramer, 1999). On the other side, earcons are relatively difficult to learn, as they are illustrated by purely symbolic sounds; the more earcons are added, the slower the learning process becomes.
                                 </p>
                             </div>
                     </div>    
@@ -124,7 +124,7 @@
                                 Parameter mapping is based on data variations, which are represented by auditory variations of such dimensions as duration, loudness, spatial position, brightness, pitch, timbre (tone) etc. (Kramer, 1994; Scaletti, 1994). In order to produce a more complex data representation, different parameters can be combined.
                             </p>
                             <p>
-                                Parameter mapping is considered to be the most popular approach of data sonification (Barrass ans Kramer, 1999). Parameter mapping is relatively easy to produce, as it is possible to construct mappings to the variety of auditory parameters with already existing tools.
+                                Parameter mapping is considered to be the most popular approach of data sonification (Barrass and Kramer, 1999). Parameter mapping is relatively easy to produce, as it is possible to construct mappings to the variety of auditory parameters with already existing tools.
                             </p>
                         </div>
                     </div>

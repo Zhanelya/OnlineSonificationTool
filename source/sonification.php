@@ -109,10 +109,11 @@
                                     echo '<ul>';
                                        echo '<li>Please use headphones for a richer experience</li>';
                                        if($_SESSION["csvColsCnt"]>1){
-                                        echo'<li>To explore <b>audification</b> and <b>parameter mapping</b>, first, select if you want to sonify all columns at once by pressing <b>Simultaneously</b>. Alternatively, if you want to sonify consecutively, column by column - press <b>Column-wise</b>, or if you want to sonify row by row - select  <b>Row-wise</b></li>';
+                                        echo'<li>To explore audification and parameter mapping, first, select if you want to sonify all columns at once by pressing <b>Simultaneously</b>. Alternatively, if you want to sonify consecutively, column by column - press <b>Column-wise</b>, or if you want to sonify row by row - select  <b>Row-wise</b></li>';
+                                        echo'<li><b>Selective</b> will activate the selective mode, where you will be able to choose which rows/columns to sonify. To switch off this mode, please press the <b>Selective</b> button again</li>';
                                         echo'<li>Select the sonification technique using <b>Audification</b>, <b>Parameter mapping: frequency (pitch)</b>, <b>Parameter mapping: duration</b>, <b>Parameter mapping: loudness</b>, <b>Parameter mapping: space</b>, or <b>Parameter mapping: space and frequency (pitch)</b> buttons, and the sound should start playing automatically.</li>';
                                        }else{
-                                        echo'<li>To explore <b>audification</b> and <b>parameter mapping</b>, first select the sonification technique using <b>Audification</b>, <b>Parameter mapping: frequency (pitch)</b>, <b>Parameter mapping: duration</b>, <b>Parameter mapping: loudness</b>, <b>Parameter mapping: space</b>, or <b>Parameter mapping: space and frequency (pitch)</b> buttons, and the sound should start playing automatically</li>';
+                                        echo'<li>To explore audification and parameter mapping, first select the sonification technique using <b>Audification</b>, <b>Parameter mapping: frequency (pitch)</b>, <b>Parameter mapping: duration</b>, <b>Parameter mapping: loudness</b>, <b>Parameter mapping: space</b>, or <b>Parameter mapping: space and frequency (pitch)</b> buttons, and the sound should start playing automatically</li>';
                                       
                                        }
                                        echo'<li>Reversed polarity will reverse the sonification mapping currently in use by mapping highs to lows and lows to highs</li>
@@ -124,19 +125,23 @@
                                             <li><b>Volume off</b>, <b>Volume down</b>, and <b>Volume up</b> allow to control the loudness of the sound flow</li>
                                             <li>Leaving the tab while the sound is playing will pause the sound flow</li>';
                                             if($_SESSION["csvColsCnt"]>1){
-                                                echo'<li>Changing between simultaneous (<b>Simultaneously</b>) and columnwise (<b>Column at a time</b>) sonification while the sound is playing will cause the current sonification flow to stop, and you will be asked to choose the technique of sonification again</li>';
+                                                echo'<li>Changing between simultaneous (<b>Simultaneously</b>) and <b>Column-wise</b>/<b>Row-wise</b> sonification while the sound is playing will cause the current sonification flow to stop, and you will be asked to choose the technique of sonification again</li>';
                                             }
                                        echo '<li>To explore <b>model-based sonification</b>, please see the graph at the bottom of the page. </li>';
                                     echo'</ul><br/> '; 
                                     
                                 echo '</div>
                                       <div class="col-md-6"> ';   
-                                    if($_SESSION["csvColsCnt"]>1){
-                                        echo '<div class="btn-group">
-                                                <button class = "btn btn-default soundflow" id = "simultaneous"><div class="glyphicon glyphicon-random"></div> <br/>Simultaneously</button>
-                                                <button class = "btn btn-default soundflow" id = "columnwise"><div class="glyphicon glyphicon-object-align-top"></div> <br/>Column-wise</button>
-                                                <button class = "btn btn-default soundflow" id = "rowwise"><div class="glyphicon glyphicon-object-align-bottom icon-rotated"></div> <br/>Row-wise</button>
-                                              </div><br/><br/>'; //if data has more than 1 column/field
+                                    if($_SESSION["csvColsCnt"]>1){ //if data has more than 1 column/field
+                                        echo '<div class="btn-toolbar" role="toolbar">';
+                                            echo '<div class="btn-group">
+                                                    <button class = "btn btn-default soundflow" id = "simultaneous"><div class="glyphicon glyphicon-random"></div> <br/>Simultaneously</button>
+                                                    <button class = "btn btn-default soundflow" id = "columnwise"><div class="glyphicon glyphicon-object-align-top"></div> <br/>Column-wise</button>
+                                                    <button class = "btn btn-default soundflow" id = "rowwise"><div class="glyphicon glyphicon-object-align-bottom icon-rotated"></div> <br/>Row-wise</button>
+                                                  </div>'; 
+                                            echo '<button class = "btn btn-default" id = "selective"><div class="glyphicon glyphicon-check"></div><br/>Selective</button>';
+                                            echo '<br/><br/>';
+                                        echo '</div>';
                                     }    
                                     echo '<div class="btn-group-vertical">
                                             <button id = "audification" class="btn btn-default sonification">Audification</button>
@@ -154,34 +159,35 @@
                                           <br/><br/>';
                                     echo '<div class="row" id = "errContainer"></div>';
                                     echo '<div class="btn-toolbar" role="toolbar">';
-                                        echo '<div class=btn-group> 
+                                        echo '<div class="btn-group"> 
                                                 <button class = "btn btn-default controls" id = "pause"><div class="glyphicon glyphicon-pause"></div><br/> Pause </button>
                                                 <button class = "btn btn-default controls" id = "play"><div class="glyphicon glyphicon-play"></div><br/> Play </button>
                                                 <button class = "btn btn-default controls" id = "stop"><div class="glyphicon glyphicon-stop"></div><br/> Stop </button>
                                                 <button class = "btn btn-default controls" id = "reverse"><div class= "glyphicon glyphicon-play icon-flipped"></div><br/> Reverse </button>
                                                 <button class = "btn btn-default controls" id = "bwd"><div class="glyphicon glyphicon-backward"></div><br/> Backward </button>
                                                 <button class = "btn btn-default controls" id = "fwd"><div class="glyphicon glyphicon-forward"></div><br/> Forward </button>
-                                                ';
-                                        echo '</div>';
+                                              </div>';
                                         echo '<button class = "btn btn-default" id = "repeat"><div class="glyphicon glyphicon-repeat"></div> <br/>Repeat</button><br/><br/>';
-                                        echo '<div class=btn-group> 
+                                    echo '</div>';   
+                                    echo '<div class=btn-group> 
                                                 <button id = "volume-off" class="btn btn-default volume"><div class="glyphicon glyphicon-volume-off"></div><br/>Volume <br/>off</button>
                                                 <button id = "volume-down" class="btn btn-default volume"><div class="glyphicon glyphicon-volume-down"></div><br/> Volume <br/>down </button>
                                                 <button id = "volume-up" class="btn btn-default volume"><div class="glyphicon glyphicon-volume-up"></div><br/> Volume <br/>up </button>
-                                              </div>';
-                                    echo '</div>';    
+                                          </div><br/><br/>';
+                                    echo '<div id="datatable">';
                                     for($i=0; $i<count($_SESSION["csvArr"]);$i++){
                                         $row = $_SESSION["csvArr"][$i];
                                         echo '<div class="row">';
                                         foreach ($row as $colNo => $col){
                                             if($i==0){
-                                                echo "<div class='col-xs-2'><br/><b><span class = name-".$colNo.">".$col."</span></b></div>";
+                                                echo "<div class='col-xs-2'><b><span class = name-".$colNo.">".$col."</span></b></div>";
                                             }else{
-                                                echo "<div class='col-xs-2 value-".$colNo."'>$col</div>";
+                                                echo "<div class='col-xs-2 value-".$colNo."-".($i-1)."'>$col</div>";
                                             }
                                         }
                                         echo '</div>';
                                     }
+                                    echo '</div>';
                                 echo '</div>';
                             echo '</div>';
                             echo '<h3>Model-Based Sonification</h3>

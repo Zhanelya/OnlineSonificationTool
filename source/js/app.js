@@ -12,7 +12,7 @@ var minLoudness = 0.16; // set min loudness
 var maxLoudness = 1.6; // set max loudness (loudness may still take higher values due to offset)
 var soundStep = 0.2; //step by which a user can increase/decrease the loudness
 
-var soundDuration = 700; //default single sound duration
+var soundDuration = 700; //default single sound duration, which also represents max sound duration for parameter mapping based on duration
 var singleSpeedDuration = 700; //default single sound duration for normal speed
 var doubleSpeedDuration = 350; //default single sound duration for double speed (e.g. fast forward)
 var minDuration = 50; // set min duration 
@@ -22,17 +22,19 @@ var minPanning = -10;
 
 var waveshapes = ["sine", "triangle", "sawtooth", "square"]; //differentiate waveforms
 
+var sonification = ''; //store sonification type
+var scheduled = []; //store sounds scheduled to play (to enable pause/play)
+var timeouts = []; //store timeouts (to allow stop button clear scheduled sounds)
+
 var play = true; //flag for play/pause
 var reverse = false; //flag for reversed play
-var timeouts = []; //store timeouts (to allow stop button clear scheduled sounds)
 var repeat = 0; //flag for looping on/off
 var columnwise = 0; //flag for column-wise data flow
 var rowwise = 0; //flag for row-wise data flow
-var scheduled = []; //store sounds scheduled to play (to enable pause/play)
-
-var numericData; //flag to check if all data is numeric
+var selective = 0; //flag for selective sonification
+var selection = {row:{},col:{}}; //selection list of rows and columns
+var numericData = 0; //flag to check if all data is numeric
 var data; //data array
-var numericData = 0;
 
 /* Initialise script */
 $(document).ready(function() {
@@ -45,7 +47,7 @@ $(document).ready(function() {
     $('.btn').click(function() {
         this.blur();
     });
-    //to fadeout errors once the user has seen them
+    //to fadeout errors 5s after the user has seen them
     document.onmousemove = function() {
         $('.err').fadeOut(5000);
     };
@@ -97,7 +99,7 @@ function start() {
     $("#pm_frequency_space_rpolarity").click(function() {
         activateSonificationBtn('pm_frequency_space_rpolarity');
     });
-
+    //play controls
     $('#play').click(function() {
         activateControlsBtn('play');
 
@@ -114,7 +116,6 @@ function start() {
     $('#stop').click(function() {
         clearBtns();
         clearTimeoutsQueue();
-        initScheduledSounds();
     });
     $('#reverse').click(function() {
         activateControlsBtn('reverse');
@@ -167,6 +168,32 @@ function start() {
         $('#stop').click();
         activateSoundFlowBtn('rowwise');
     });
+    //selective sonification controls
+    $('#selective').click(function() {
+        $('#stop').click();
+        if (selective === 0) {
+            selective = 1; //enable selective
+            $(this).addClass('active');
+            addCheckBoxes();
+        } else {
+            selective = 0; //disable selective
+            $(this).removeClass('active');
+            selection = {row:{},col:{}}; //clear selection list
+            removeCheckBoxes();
+        }
+    });
+    $(document).delegate('.selection', 'click', function(){
+        $('#stop').click();
+        var id = this.getAttribute('id'); //get id of the element
+        var type = id.split('-')[0]; //get the type of selection - row/column
+        var number = id.split('-')[1]; //get the number of row/column
+        if(this.checked) {
+            selection[type][number] = true; //add to selection list rows/columns selected
+        }else{
+            delete selection[type][number];
+        }
+    }); 
+    //volume controls
     $('#volume-off').click(function() { //mute sound
         soundLoudness = 0;
         minLoudness = 0;
@@ -265,12 +292,9 @@ function activateSonificationBtn(btn) {
         $('.sonification').removeClass('active');
         $('#' + btn).addClass('active');
         activateControlsBtn('play');
-
         soundDuration = singleSpeedDuration;
         reverse = false;
         clearTimeoutsQueue();
-        initScheduledSounds();
-
         eval(btn + "()"); //call the function corresponding to sonification technique
     } else {
         $('#errContainer').append('<div class="col-md-12 err">Error. Please choose simultaneous, column-wise or row-wise sonification</div>');
@@ -294,6 +318,24 @@ function activateSoundFlowBtn(btn) {
     $('#' + btn).addClass('active');
 }
 
+/* Prepend checkboxes to data table to enable selective sonification */
+function addCheckBoxes(){
+    $('#datatable').prepend("<div class='row sel-col'><div class='col-xs-1'></div></div>");
+    for (var i=0; i<data.colCount; i++){
+        $('.sel-col').append("<div class='col-xs-2'><input type='checkbox' class='selection' id='col-"+i+"'/></div>");//prepend column checkboxes
+    }
+    $('.name-0').closest('div').parent().prepend("<div class='col-xs-1 sel-row'></div>");//prepend placeholder for the row containing field names
+    for (var i=0; i<data.rowCount; i++){
+        $('.value-0-'+i).parent().prepend("<div class='col-xs-1 sel-row'><input type='checkbox' class= 'selection' id='row-"+i+"'/></div>");//prepend row checkboxes
+    }    
+}
+
+/* Remove checkboxes from data table to disable selective sonification */
+function removeCheckBoxes(){
+    $('.sel-col').remove();
+    $('.sel-row').remove();
+}
+
 /* Clear all active buttons including enabled repeat */
 function clearBtns() {
     $('.controls').removeClass('active');
@@ -303,7 +345,7 @@ function clearBtns() {
     repeat = 0;
     $('#repeat').removeClass('active');
 
-    //set sound Duration back to default
+    //set sound Duration back to default speed
     soundDuration = singleSpeedDuration;
 }
 
@@ -315,18 +357,10 @@ function clearTimeoutsQueue() {
     timeouts = [];
 }
 
-/* Initialise/clear the array of schediled sounds */
-function initScheduledSounds() {
-    scheduled = new Array();
-    for (i = 0; i < data.colCount; i++) {
-        scheduled.push(new Array());
-    }
-}
-
 /* Audification (direct mapping of data to pitch/frequency) */
 function audification() {
     play = true;
-    scheduled[data.colCount] = 'audification';
+    sonification = 'audification';
     //offset if the value is below or above reasonable hearable range
     var offset = calculateOffsetAudification();
     playSoundPattern(offset);
@@ -335,16 +369,16 @@ function audification() {
 /* Parameter mapping - frequency */
 function pm_frequency() {
     play = true;
-    scheduled[data.colCount] = 'pm_frequency';
+    sonification = 'pm_frequency';
     //offset if the value is below or above reasonable hearable range
     var offset = calculateOffsetPM();
     playSoundPattern(offset);
 }
 
-/* Parameter mapping - frequency */
+/* Parameter mapping - duration */
 function pm_duration() {
     play = true;
-    scheduled[data.colCount] = 'pm_duration';
+    sonification = 'pm_duration';
     //offset if the value is below or above reasonable hearable range
     var offset = calculateOffsetPM();
     playSoundPattern(offset);
@@ -353,7 +387,7 @@ function pm_duration() {
 /* Parameter mapping - loudness */
 function pm_loudness() {
     play = true;
-    scheduled[data.colCount] = 'pm_loudness';
+    sonification = 'pm_loudness';
     //offset if the value is below or above reasonable hearable range
     var offset = calculateOffsetPM();
     playSoundPattern(offset);
@@ -362,16 +396,16 @@ function pm_loudness() {
 /* Parameter mapping - space */
 function pm_space() {
     play = true;
-    scheduled[data.colCount] = 'pm_space';
+    sonification = 'pm_space';
     //offset if the value is below or above reasonable hearable range
     var offset = calculateOffsetPM();
     playSoundPattern(offset);
 }
 
-/* Parameter mapping - space */
+/* Parameter mapping - frequency and space */
 function pm_frequency_space() {
     play = true;
-    scheduled[data.colCount] = 'pm_frequency_space';
+    sonification = 'pm_frequency_space';
     //offset if the value is below or above reasonable hearable range
     var offset = calculateOffsetPM();
     playSoundPattern(offset);
@@ -380,37 +414,38 @@ function pm_frequency_space() {
 /* Parameter mapping - frequency - reversed polarity*/
 function pm_frequency_rpolarity() {
     play = true;
-    scheduled[data.colCount] = 'pm_frequency_rpolarity';
+    sonification = 'pm_frequency_rpolarity';
     playSoundPattern();
 }
 
-/* Parameter mapping - frequency  - reversed polarity*/
+/* Parameter mapping - duration  - reversed polarity*/
 function pm_duration_rpolarity() {
     play = true;
-    scheduled[data.colCount] = 'pm_duration_rpolarity';
+    sonification = 'pm_duration_rpolarity';
     playSoundPattern();
 }
 
 /* Parameter mapping - loudness  - reversed polarity*/
 function pm_loudness_rpolarity() {
     play = true;
-    scheduled[data.colCount] = 'pm_loudness_rpolarity';
+    sonification = 'pm_loudness_rpolarity';
     playSoundPattern();
 }
 
 /* Parameter mapping - space  - reversed polarity*/
 function pm_space_rpolarity() {
     play = true;
-    scheduled[data.colCount] = 'pm_space_rpolarity';
+    sonification = 'pm_space_rpolarity';
     playSoundPattern();
 }
 
-/* Parameter mapping - space  - reversed polarity*/
+/* Parameter mapping - frequency and space  - reversed polarity*/
 function pm_frequency_space_rpolarity() {
     play = true;
-    scheduled[data.colCount] = 'pm_frequency_space_rpolarity';
+    sonification = 'pm_frequency_space_rpolarity';
     playSoundPattern();
 }
+
 /* Calculate the offset needed for audification in order to 
  * fit the sound pattern into reasonable audible range 
  * (to be equal or above of the predefined minimum frequency)*/
@@ -430,25 +465,24 @@ function calculateOffsetAudification() {
  * in order to fit the sound pattern into reasonable audible range
  * (to be equal or above of the predefined minimum parameter value) */
 function calculateOffsetPM() {
-    var method = scheduled[data.colCount];
     var offset = {};
     var possibleMin = {};
     var maxParam = {};
     var minParam = {};
     
-    if (method === 'pm_frequency') {
+    if (sonification === 'pm_frequency') {
         maxParam.freq = maxFreq;
         minParam.freq = minFreq;
-    } else if (method === 'pm_duration') {
+    } else if (sonification === 'pm_duration') {
         maxParam.duration = soundDuration;
         minParam.duration = minDuration;
-    } else if (method === 'pm_loudness') {
+    } else if (sonification === 'pm_loudness') {
         maxParam.loudness = maxLoudness;
         minParam.loudness = minLoudness;
-    }else if (method === 'pm_space'){
+    }else if (sonification === 'pm_space'){
         maxParam.panning = maxPanning;
         minParam.panning = minPanning;
-    }else if(method === 'pm_frequency_space'){
+    }else if(sonification === 'pm_frequency_space'){
         maxParam = {freq:maxFreq,panning:maxPanning};
         minParam = {freq:minFreq,panning:minPanning};
     }
@@ -465,48 +499,77 @@ function calculateOffsetPM() {
     return offset;
 }
 
-/* Play a sound pattern */
+/* Schedule sounds to play */
 function playSoundPattern(offset) {
     var offset = typeof offset !== 'undefined' ? offset : 0; //set default param value
+    scheduled = new Array();
     if (numericData === 1) {
-        for (var i = 0; i < data.colCount; i++) {
-            colData = data.dataVals[i];
-            for (var k = 0; k < colData.length; k++) {
-                (function() {
-                    /* schedule sound to play */
-                    var colNo = i;
-                    var rowNo = k;
-                    var val = {value: colData[k], offset: offset};
-                    scheduled[colNo].push(val);
-                    /* play scheduled  sounds */
-                    var t = calculateTimeout(colNo, rowNo);
-                    timeouts.push(setTimeout(function() {
-                        if (play === true) {
-                            sonifySound(colNo);
-                            if (repeat && finished()) {
-                                loop();
-                            }
-                            if (!repeat && finished()) {
-                                clearBtns();
-                            }
+        if(selective && (Object.keys(selection.row).length === 0)){ //no rows selected in selective mode
+            clearBtns();
+            $('#errContainer').append('<div class="col-md-12 err">Error. You have not selected any rows to be sonified </div>');
+        }else if(selective && (Object.keys(selection.col).length === 0)){ //no columns selected in selective mode
+            clearBtns();
+            $('#errContainer').append('<div class="col-md-12 err">Error. You have not selected any columns to be sonified </div>');
+        }else{
+            for (var colNo = 0; colNo < data.colCount; colNo++) {
+                if((!selective) || (selective && selection.col[colNo])){
+                    scheduled.push(new Array()); //add new array per field
+                }
+                for (var rowNo = 0; rowNo < data.dataVals[colNo].length; rowNo++) {
+                    (function() {
+                        var val = {value: data.dataVals[colNo][rowNo], offset: offset};
+                        if((!selective) || (selective && selection.col[colNo] && selection.row[rowNo])){
+                            scheduled[scheduled.length-1].push(val); //add sounds scheduled to be played for each field 
                         }
-                    }, t));
-                    /* generate click sounds for row-wise/column-wise sonification */
-                    if ((columnwise && (k === colData.length - 1)) || //reached last column in row-wise sonification
-                            (rowwise && (i === data.colCount - 1))) { //reached last row in column-wise sonification
-                        timeouts.push(setTimeout(function() {
-                            if (play === true) {
-                                playClickSound();
-                            }
-                        }, t + soundDuration));
-                    }
-                })(k);
+                    })(rowNo);
+                }
             }
-        }
+            playScheduledSounds();
+        }    
     } else {
+        clearBtns()
         $('#errContainer').append('<div class="col-md-12 err">Error. Please upload a file with numerical data</div>');
     }
 }
+
+/* Play scheduled  sounds */
+function playScheduledSounds(){
+    var timeToFinishRow = 0;
+    if (rowwise) {
+        timeToFinishRow = finishRow();
+    }
+    for (i = 0; i < scheduled.length; i++) {
+        colData = scheduled[i];
+        for (var k = 0; k < colData.length; k++) {
+            (function() {
+                var colNo = i;
+                var rowNo = k;
+                var t = calculateTimeout(colNo, rowNo) + timeToFinishRow;
+                timeouts.push(setTimeout(function() {
+                    if (play === true) {
+                        sonifySound(colNo);
+                        if (repeat && finished()) {
+                            loop();
+                        }
+                        if (!repeat && finished()) {
+                            clearBtns();
+                        }
+                    }
+                }, t));
+                /* generate click sounds for row-wise/column-wise sonification */
+                if ((columnwise && (rowNo === colData.length - 1)) || //reached last column in row-wise sonification
+                    (rowwise && (colNo === scheduled.length - 1))) { //reached last row in column-wise sonification
+                    timeouts.push(setTimeout(function() {
+                        if (play === true) {
+                            playClickSound();
+                        }
+                    }, t + soundDuration));
+                }
+            })(k);
+        }
+    }
+}
+
 /* Calculate the time needed for a click sound */
 function calculateClickTime(colNo, rowNo) {
     var clickTime = 0;
@@ -526,7 +589,7 @@ function calculateTimeout(colNo, rowNo) {
     } else if (columnwise) {
         t = ((colNo * colData.length) + rowNo) * soundDuration; //play a value from 1st column for every row, then start the next column
     } else if (rowwise) {
-        t = ((rowNo * data.colCount) + colNo) * soundDuration; //play values from the 1st row for every column, then start the next row
+        t = ((rowNo * scheduled.length) + colNo) * soundDuration; //play values from the 1st row for every column, then start the next row
     }
     return t + calculateClickTime(colNo, rowNo);
 }
@@ -536,7 +599,6 @@ function calculateTimeout(colNo, rowNo) {
  * pass the generated parameters to the sound playing routine, and
  * remove the played sounds from the queue/schedule*/
 function sonifySound(colNo) {
-    var method = scheduled[data.colCount];
     try {
         if (maxLoudness !== 0) {
             //retrieve sound value from queue/schedule
@@ -548,49 +610,45 @@ function sonifySound(colNo) {
                 var playVal = col[0]; //get first element 
             }
             //play sound with different parameters for each sonification type
-            if (method === 'audification') {
+            if (sonification === 'audification') {
                 var freq = playVal.value + playVal.offset; //direct mapping of data to sound
                 playSound(colNo, freq, soundLoudness);
-            } else if (method === 'pm_frequency') {
+            } else if (sonification === 'pm_frequency') {
                 var freq = closestMidi((playVal.value / data.max) * maxFreq + playVal.offset.freq); //mapping to frequency
                 playSound(colNo, freq, soundLoudness);
-            } else if (method === 'pm_duration') {
+            } else if (sonification === 'pm_duration') {
                 var duration = (playVal.value / data.max) * soundDuration + playVal.offset.duration; //mapping to duration
                 var freqOffset = freqDifference * colNo;
                 playSound(colNo, freqOffset, soundLoudness, 0, duration);
-            } else if (method === 'pm_loudness') {
+            } else if (sonification === 'pm_loudness') {
                 var freqOffset = freqDifference * colNo;
                 var loudness = (playVal.value / data.max) * maxLoudness + playVal.offset.loudness; //mapping to loudness
                 playSound(colNo, freqOffset, loudness);
-            } else if (method === 'pm_space') {
+            } else if (sonification === 'pm_space') {
                 var panningX = (playVal.value / data.max) * maxPanning  + playVal.offset.panning; //mapping to panning
-                //range of panning is from -10 to +10, hence 20,
-                //the additional offset is -10 to set it alternating around 0
                 var freqOffset = freqDifference * colNo;
                 playSound(colNo, freqOffset, soundLoudness, panningX);
-            } else if (method === 'pm_frequency_space') {
+            } else if (sonification === 'pm_frequency_space') {
                 var panningX = (playVal.value / data.max) * maxPanning + playVal.offset.panning; //mapping to panning
                 var freq = closestMidi((playVal.value / data.max) * maxFreq + playVal.offset.freq); //mapping to frequency
                 playSound(colNo, freq, soundLoudness, panningX);
-            } else if (method === 'pm_frequency_rpolarity') {
+            } else if (sonification === 'pm_frequency_rpolarity') {
                 var freq = closestMidi((1 - playVal.value / data.max) * maxFreq + minFreq); //mapping to frequency
                 playSound(colNo, freq, soundLoudness);
-            } else if (method === 'pm_duration_rpolarity') {
+            } else if (sonification === 'pm_duration_rpolarity') {
                 var duration = (1 - playVal.value / data.max) * soundDuration + minDuration; //mapping to duration
                 var freqOffset = freqDifference * colNo;
                 playSound(colNo, freqOffset, soundLoudness, 0, duration);
-            } else if (method === 'pm_loudness_rpolarity') {
+            } else if (sonification === 'pm_loudness_rpolarity') {
                 var freqOffset = freqDifference * colNo;
                 var loudness = (1 - playVal.value / data.max) * maxLoudness + minLoudness; //mapping to loudness
                 playSound(colNo, freqOffset, loudness);
             }
-            else if (method === 'pm_space_rpolarity') {
+            else if (sonification === 'pm_space_rpolarity') {
                 var panningX = (1 - playVal.value / data.max) * maxPanning + minPanning; //mapping to panning
-                ////range of panning is from -10 to +10, hence 20,
-                //offset is -10 to set it alternating around 0
                 var freqOffset = freqDifference * colNo;
                 playSound(colNo, freqOffset, soundLoudness, panningX);
-            } else if (method === 'pm_frequency_space_rpolarity') {
+            } else if (sonification === 'pm_frequency_space_rpolarity') {
                 var panningX = (1 - playVal.value / data.max) * maxPanning + minPanning; //mapping to panning
                 var freq = closestMidi((1 - playVal.value / data.max) * maxFreq + minFreq); //mapping to frequency
                 playSound(colNo, freq, soundLoudness, panningX);
@@ -605,10 +663,10 @@ function sonifySound(colNo) {
     } catch (e) {
     }
 }
-/* Check if one of the columns is still playing, or all the data was sonified */
+/* Check if one of the columns is still playing, or all data was sonified */
 function finished() {
     var finished = 1;
-    for (j = 0; j < scheduled.length - 1; j++) {
+    for (j = 0; j < scheduled.length; j++) {
         //if one of the columns is still playing, set finished to false
         if (scheduled[j].length > 0)
             finished = 0;
@@ -620,12 +678,10 @@ function finished() {
 function loop() {
     setTimeout(function() {
         try {
-            //call a sonification function (audification/pm_frequency/pm_loudness)
-            //last element  of the scheduled array stores what sonification technique is active
-            eval(scheduled[scheduled.length - 1] + "()");
-        } catch (err) {
-        }
-    }, soundDuration);
+            //call a sonification function according to currently selected sonification technique
+            eval(sonification + "()");
+        } catch (err) {}
+    }, 2*soundDuration); // wait until the last sound (and the click sound) is played
 }
 
 /* Find closest frequency corresponding to a MIDI note*/
@@ -651,52 +707,18 @@ function resumeSoundPattern() {
     //activate controls only if one of the sonification methods was selected
     if ($('.sonification').hasClass('active')) {
         clearTimeoutsQueue(); //clear js events queue to eliminate sound overlaps
-        //depending on the sonification technique, use different replays of scheduled sounds
         play = true;
-        var timeToFinishRow = 0;
-        if (rowwise) {
-            timeToFinishRow = finishRow();
-        }
-        for (i = 0; i < data.colCount; i++) {
-            colData = scheduled[i];
-            for (var k = 0; k < colData.length; k++) {
-                (function() {
-                    var colNo = i;
-                    var rowNo = k;
-                    var t = calculateTimeout(colNo, rowNo) + timeToFinishRow;
-                    timeouts.push(setTimeout(function() {
-                        if (play === true) {
-                            sonifySound(colNo);
-                            if (repeat && finished()) {
-                                loop();
-                            }
-                            if (!repeat && finished()) {
-                                clearBtns();
-                            }
-                        }
-                    }, t));
-                    /* generate click sounds for row-wise/column-wise sonification */
-                    if ((columnwise && (k === colData.length - 1)) || //reached last column in row-wise sonification
-                            (rowwise && (i === data.colCount - 1))) { //reached last row in column-wise sonification
-                        timeouts.push(setTimeout(function() {
-                            if (play === true) {
-                                playClickSound();
-                            }
-                        }, t + soundDuration));
-                    }
-                })(k);
-            }
-        }
+        playScheduledSounds();
     }
 }
+
 /* Finish playing the current row */
 function finishRow() {
     var timeToFinishRow = 0;
-    for (i = 0; i < data.colCount; i++) {
-        if (typeof scheduled[i + 1] !== "string" && //if the next element is not a string representing sonification type
-                scheduled[i].length < scheduled[i + 1].length) {//if it was paused before the row finished playing
+    for (i = 0; i < scheduled.length; i++) {
+        if (scheduled[i + 1] && scheduled[i].length < scheduled[i + 1].length) {//if it was paused before the row finished playing
             //finish playing the current row
-            for (j = i + 1; j < data.colCount; j++) {
+            for (j = i + 1; j < scheduled.length; j++) {
                 timeToFinishRow += soundDuration;
                 (function() {
                     var colNo = j;
@@ -708,7 +730,7 @@ function finishRow() {
                         }
                     }, t));
                     /* generate click sounds for row-wise sonification */
-                    if (j === data.colCount - 1) { //reached last row in column-wise sonification
+                    if (j === scheduled.length - 1) { //reached last row in column-wise sonification
                         timeToFinishRow += soundDuration;
                         timeouts.push(setTimeout(function() {
                             if (play === true) {
@@ -728,79 +750,77 @@ function finishRow() {
  ** Spectra is controlled by Oscillator wave type (shape) 
  ** Envelope is controlled by attack, sustain and decay */
 function playSound(colNo, freq, loudness, panningX, duration) {
-    var method = scheduled[data.colCount];
     panningX = typeof panningX !== 'undefined' ? panningX : 0; //set default param value
     duration = typeof duration !== 'undefined' ? duration : soundDuration; //set default param value
 
-    var c = (colNo + 1) / data.colCount;
-
+    var c = (colNo+1) / data.colCount;
     var attack = c * duration * 1 / 4,
             sustain = c * duration * 3 / 4,
             decay = duration,
             gain = audioCtx.createGain(),
             osc = audioCtx.createOscillator(),
             panner = audioCtx.createPanner();
-    if (!columnwise) {
-        loudness = loudness / (scheduled.length - 1);
-    }
     //set loudness (#column times) lower if all columns are played simultaneously
-
+    if (!columnwise) {
+        loudness = loudness / (scheduled.length);
+    }
+    
     gain.connect(audioCtx.destination);
     gain.gain.setValueAtTime(0, audioCtx.currentTime);
     gain.gain.linearRampToValueAtTime(loudness, audioCtx.currentTime + attack / 1000);
     gain.gain.linearRampToValueAtTime(loudness, audioCtx.currentTime + sustain / 1000);
     gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + decay / 1000);
 
-    if (method === 'pm_frequency' ||
-            method === 'audification' ||
-            method === 'pm_frequency_space' ||
-            method === 'pm_frequency_rpolarity'||
-            method === 'pm_frequency_space_rpolarity') {
+    if (sonification === 'pm_frequency' ||
+            sonification === 'audification' ||
+            sonification === 'pm_frequency_space' ||
+            sonification === 'pm_frequency_rpolarity'||
+            sonification === 'pm_frequency_space_rpolarity') {
         osc.frequency.value = freq;
-    } else if (method === 'pm_loudness' ||
-            method === 'pm_space' ||
-            method === 'pm_duration' ||
-            method === 'pm_duration_rpolarity' ||
-            method === 'pm_space_rpolarity' ||
-            method === 'pm_loudness_rpolarity') {
+    } else if (sonification === 'pm_loudness' ||
+            sonification === 'pm_space' ||
+            sonification === 'pm_duration' ||
+            sonification === 'pm_duration_rpolarity' ||
+            sonification === 'pm_space_rpolarity' ||
+            sonification === 'pm_loudness_rpolarity') {
         osc.frequency.value = base_a4 + freq; //set frequency to default and add offset (freq) to differentiate columns
     }
 
     osc.type = waveshapes[colNo % 4]; //choose 1 of the 4 wave shapes
     osc.detune = 0;
-    if (method === 'pm_space' ||
-            method === 'pm_space_rpolarity' ||
-            method === 'pm_frequency_space' ||
-            method === 'pm_frequency_space_rpolarity') {
+    if (sonification === 'pm_space' ||
+            sonification === 'pm_space_rpolarity' ||
+            sonification === 'pm_frequency_space' ||
+            sonification === 'pm_frequency_space_rpolarity') {
         osc.connect(panner);
         panner.connect(gain);
         panner.setPosition(panningX, 1, 1);
-    } else if (method === 'pm_loudness' ||
-            method === 'pm_frequency' ||
-            method === 'pm_duration' ||
-            method === 'audification' ||
-            method === 'pm_frequency_rpolarity' ||
-            method === 'pm_duration_rpolarity' ||
-            method === 'pm_loudness_rpolarity') {
+    } else if (sonification === 'pm_loudness' ||
+            sonification === 'pm_frequency' ||
+            sonification === 'pm_duration' ||
+            sonification === 'audification' ||
+            sonification === 'pm_frequency_rpolarity' ||
+            sonification === 'pm_duration_rpolarity' ||
+            sonification === 'pm_loudness_rpolarity') {
         osc.connect(gain);
     }
     osc.start(0);
 
     setTimeout(function() {
         osc.stop(0);
-        if (method === 'pm_space' ||
-                method === 'pm_frequency_space'||
-                method === 'pm_space_rpolarity' ||
-                method === 'pm_frequency_space_rpolarity') {
+        if (sonification === 'pm_space' ||
+                sonification === 'pm_frequency_space'||
+                sonification === 'pm_space_rpolarity' ||
+                sonification === 'pm_frequency_space_rpolarity') {
             panner.disconnect(gain);
             osc.disconnect(panner);
-        } else if (method === 'pm_loudness' ||
-                method === 'pm_frequency' ||
-                method === 'pm_duration' ||
-                method === 'audification' ||
-                method === 'pm_frequency_rpolarity' ||
-                method === 'pm_duration_rpolarity' ||
-                method === 'pm_loudness_rpolarity') {
+        } else if (sonification === 'pm_loudness' ||
+                sonification === 'pm_frequency' ||
+                sonification === 'pm_duration' ||
+                sonification === 'audification' ||
+                sonification === 'pm_frequency_rpolarity' ||
+                sonification === 'pm_duration_rpolarity' ||
+                sonification === 'pm_loudness_rpolarity') {
             osc.disconnect(gain);
         }
         gain.disconnect(audioCtx.destination);
@@ -808,7 +828,7 @@ function playSound(colNo, freq, loudness, panningX, duration) {
 }
 
 /* Play a click sound to make the end of row/column 
- * distinguishable in row and column-wise sonification*/
+ * distinguishable in row- and column-wise sonification*/
 function playClickSound() {
     if (maxLoudness !== 0) { //if the volume is on
         var gain = audioCtx.createGain(),
