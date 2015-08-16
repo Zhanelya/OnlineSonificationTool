@@ -691,15 +691,20 @@ function closestMidi(freq) {
 
 /* Convert frequency to MIDI note number */
 function freqToMidi(freq) {
-    /* http://newt.phys.unsw.edu.au/jw/notes.html */
+    /* Note names, MIDI numbers and frequencies [Online].
+     * http://newt.phys.unsw.edu.au/jw/notes.html 
+     * [Accessed 17 June 2015] */
     return Math.round(12 * Math.log2(freq / base_a4));
-    ;
+    /**********************************************/
 }
 
 /* Convert MIDI note number to frequency */
 function midiToFreq(midi) {
-    /* http://newt.phys.unsw.edu.au/jw/notes.html */
+    /* Note names, MIDI numbers and frequencies [Online].
+     * http://newt.phys.unsw.edu.au/jw/notes.html 
+     * [Accessed 17 June 2015] */
     return base_a4 * Math.pow(2, (midi) / 12);
+    /**********************************************/
 }
 
 /* Resume playing sound after pause/play were pressed */
