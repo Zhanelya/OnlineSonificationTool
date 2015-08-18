@@ -66,7 +66,11 @@
                         </tr>
                     </table>
                 </div>
-            </div><br/>    
+            </div>
+            <div class="row">
+                <p class="col-md-12">*Please note that the file should contain comma-separated numerical data only, and the top row should contain the field names, separated by commas</p>
+            </div>
+            <br/>    
             <h3>Please select a .csv file:</h3>
             <div class="row">
                 <div class="col-md-3"><h4><input type="file" name="csv" value="" /></h4></div>
@@ -86,9 +90,6 @@
                         echo '<div class="row" id = "topErrContainer"></div>';
                     ?>
                 </div>
-            </div>
-            <div class="row">
-                <p class="col-md-12">*Please note that the file should contain comma-separated numerical data only, and the top row should contain the field names, separated by commas</p>
             </div>
             </form>
             </table>

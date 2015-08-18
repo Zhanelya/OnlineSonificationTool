@@ -34,7 +34,7 @@ var rowwise = 0; //flag for row-wise data flow
 var selective = 0; //flag for selective sonification
 var selection = {row:{},col:{}}; //selection list of rows and columns
 var numericData = 0; //flag to check if all data is numeric
-var data; //data array
+var data = {}; //data array
 
 /* Initialise script */
 $(document).ready(function() {
@@ -61,7 +61,7 @@ $(document).ready(function() {
 
 /* Prepare data and initialise sonification buttons */
 function start() {
-    data = getData();
+    processData();
     isDataNumeric();
     //audification     
     $("#audification").click(function() {
@@ -220,9 +220,7 @@ function start() {
 }
 
 /* Get data from DOM elements and store it in a multi-D array */
-function getData() {
-    data = {}; //initialise return value
-
+function processData() {
     var colCount = document.getElementById("colCount").innerHTML; //get number of columns
     var rowCount = document.getElementById("rowCount").innerHTML; //get number of rows
 
@@ -255,23 +253,28 @@ function getData() {
         var colNo = this.className.split('-')[1];           //column number
         colNames[colNo] = this.innerHTML;
     });
-
+    
+    var max = Number.MIN_VALUE;
+    for (var k = 0; k < colCount; k++) {
+        colMax = maxDataVals[k];
+        if (max < colMax)
+            max = colMax;
+    }
+    
+    var graphData = new Array(); //format data into graph data object to be used by MBS
+    for(var i=0; i<colCount; i++){
+        graphData.push({name: colNames[i],
+                        data: dataVals[i]});
+    }
+    
     data.colNames = colNames;
     data.colCount = colCount;
     data.rowCount = rowCount;
     data.dataVals = dataVals;
     data.maxDataVals = maxDataVals;
     data.minDataVals = minDataVals;
-
-    var max = Number.MIN_VALUE;
-    for (var k = 0; k < data.colCount; k++) {
-        colMax = data.maxDataVals[k];
-        if (max < colMax)
-            max = colMax;
-    }
     data.max = max;
-
-    return data;
+    data.graphData = graphData;
 }
 
 /* check if data is values are numeric */
@@ -363,7 +366,7 @@ function audification() {
     sonification = 'audification';
     //offset if the value is below or above reasonable hearable range
     var offset = calculateOffsetAudification();
-    playSoundPattern(offset);
+    scheduleSoundPattern(offset);
 }
 
 /* Parameter mapping - frequency */
@@ -372,7 +375,7 @@ function pm_frequency() {
     sonification = 'pm_frequency';
     //offset if the value is below or above reasonable hearable range
     var offset = calculateOffsetPM();
-    playSoundPattern(offset);
+    scheduleSoundPattern(offset);
 }
 
 /* Parameter mapping - duration */
@@ -381,7 +384,7 @@ function pm_duration() {
     sonification = 'pm_duration';
     //offset if the value is below or above reasonable hearable range
     var offset = calculateOffsetPM();
-    playSoundPattern(offset);
+    scheduleSoundPattern(offset);
 }
 
 /* Parameter mapping - loudness */
@@ -390,7 +393,7 @@ function pm_loudness() {
     sonification = 'pm_loudness';
     //offset if the value is below or above reasonable hearable range
     var offset = calculateOffsetPM();
-    playSoundPattern(offset);
+    scheduleSoundPattern(offset);
 }
 
 /* Parameter mapping - space */
@@ -399,7 +402,7 @@ function pm_space() {
     sonification = 'pm_space';
     //offset if the value is below or above reasonable hearable range
     var offset = calculateOffsetPM();
-    playSoundPattern(offset);
+    scheduleSoundPattern(offset);
 }
 
 /* Parameter mapping - frequency and space */
@@ -408,42 +411,42 @@ function pm_frequency_space() {
     sonification = 'pm_frequency_space';
     //offset if the value is below or above reasonable hearable range
     var offset = calculateOffsetPM();
-    playSoundPattern(offset);
+    scheduleSoundPattern(offset);
 }
 
 /* Parameter mapping - frequency - reversed polarity*/
 function pm_frequency_rpolarity() {
     play = true;
     sonification = 'pm_frequency_rpolarity';
-    playSoundPattern();
+    scheduleSoundPattern();
 }
 
 /* Parameter mapping - duration  - reversed polarity*/
 function pm_duration_rpolarity() {
     play = true;
     sonification = 'pm_duration_rpolarity';
-    playSoundPattern();
+    scheduleSoundPattern();
 }
 
 /* Parameter mapping - loudness  - reversed polarity*/
 function pm_loudness_rpolarity() {
     play = true;
     sonification = 'pm_loudness_rpolarity';
-    playSoundPattern();
+    scheduleSoundPattern();
 }
 
 /* Parameter mapping - space  - reversed polarity*/
 function pm_space_rpolarity() {
     play = true;
     sonification = 'pm_space_rpolarity';
-    playSoundPattern();
+    scheduleSoundPattern();
 }
 
 /* Parameter mapping - frequency and space  - reversed polarity*/
 function pm_frequency_space_rpolarity() {
     play = true;
     sonification = 'pm_frequency_space_rpolarity';
-    playSoundPattern();
+    scheduleSoundPattern();
 }
 
 /* Calculate the offset needed for audification in order to 
@@ -500,7 +503,7 @@ function calculateOffsetPM() {
 }
 
 /* Schedule sounds to play */
-function playSoundPattern(offset) {
+function scheduleSoundPattern(offset) {
     var offset = typeof offset !== 'undefined' ? offset : 0; //set default param value
     scheduled = new Array();
     if (numericData === 1) {
@@ -524,7 +527,7 @@ function playSoundPattern(offset) {
                     })(rowNo);
                 }
             }
-            playScheduledSounds();
+            sonifyScheduledSounds();
         }    
     } else {
         clearBtns()
@@ -533,7 +536,7 @@ function playSoundPattern(offset) {
 }
 
 /* Play scheduled  sounds */
-function playScheduledSounds(){
+function sonifyScheduledSounds(){
     var timeToFinishRow = 0;
     if (rowwise) {
         timeToFinishRow = finishRow();
@@ -568,6 +571,60 @@ function playScheduledSounds(){
             })(k);
         }
     }
+}
+
+/* Finish sonfying the current row (in case of row-wise sonification) */
+function finishRow() {
+    var timeToFinishRow = 0;
+    for (i = 0; i < scheduled.length; i++) {
+        if (scheduled[i + 1] && scheduled[i].length < scheduled[i + 1].length) {//if it was paused before the row finished playing
+            //finish playing the current row
+            for (j = i + 1; j < scheduled.length; j++) {
+                timeToFinishRow += soundDuration;
+                (function() {
+                    var colNo = j;
+                    var t = (colNo - (i + 1)) * soundDuration;
+                    //play scheduled from the unfinished row
+                    timeouts.push(setTimeout(function() {
+                        if (play === true) {
+                            sonifySound(colNo);
+                        }
+                    }, t));
+                    /* generate click sounds for row-wise sonification */
+                    if (j === scheduled.length - 1) { //reached last row in column-wise sonification
+                        timeToFinishRow += soundDuration;
+                        timeouts.push(setTimeout(function() {
+                            if (play === true) {
+                                playClickSound();
+                            }
+                        }, t + soundDuration));
+                    }
+                })(j);
+            }
+        }
+    }
+    return timeToFinishRow;
+}
+
+/* Check if one of the columns is still playing, or all data was sonified */
+function finished() {
+    var finished = 1;
+    for (j = 0; j < scheduled.length; j++) {
+        //if one of the columns is still playing, set finished to false
+        if (scheduled[j].length > 0)
+            finished = 0;
+    }
+    return finished;
+}
+
+/* Repeat if repeat is on */
+function loop() {
+    setTimeout(function() {
+        try {
+            //call a sonification function according to currently selected sonification technique
+            eval(sonification + "()");
+        } catch (err) {}
+    }, 2*soundDuration); // wait until the last sound (and the click sound) is played
 }
 
 /* Calculate the time needed for a click sound */
@@ -663,26 +720,6 @@ function sonifySound(colNo) {
     } catch (e) {
     }
 }
-/* Check if one of the columns is still playing, or all data was sonified */
-function finished() {
-    var finished = 1;
-    for (j = 0; j < scheduled.length; j++) {
-        //if one of the columns is still playing, set finished to false
-        if (scheduled[j].length > 0)
-            finished = 0;
-    }
-    return finished;
-}
-
-/* Repeat if repeat is on */
-function loop() {
-    setTimeout(function() {
-        try {
-            //call a sonification function according to currently selected sonification technique
-            eval(sonification + "()");
-        } catch (err) {}
-    }, 2*soundDuration); // wait until the last sound (and the click sound) is played
-}
 
 /* Find closest frequency corresponding to a MIDI note*/
 function closestMidi(freq) {
@@ -713,41 +750,8 @@ function resumeSoundPattern() {
     if ($('.sonification').hasClass('active')) {
         clearTimeoutsQueue(); //clear js events queue to eliminate sound overlaps
         play = true;
-        playScheduledSounds();
+        sonifyScheduledSounds();
     }
-}
-
-/* Finish playing the current row */
-function finishRow() {
-    var timeToFinishRow = 0;
-    for (i = 0; i < scheduled.length; i++) {
-        if (scheduled[i + 1] && scheduled[i].length < scheduled[i + 1].length) {//if it was paused before the row finished playing
-            //finish playing the current row
-            for (j = i + 1; j < scheduled.length; j++) {
-                timeToFinishRow += soundDuration;
-                (function() {
-                    var colNo = j;
-                    var t = (colNo - (i + 1)) * soundDuration;
-                    //play scheduled from the unfinished row
-                    timeouts.push(setTimeout(function() {
-                        if (play === true) {
-                            sonifySound(colNo);
-                        }
-                    }, t));
-                    /* generate click sounds for row-wise sonification */
-                    if (j === scheduled.length - 1) { //reached last row in column-wise sonification
-                        timeToFinishRow += soundDuration;
-                        timeouts.push(setTimeout(function() {
-                            if (play === true) {
-                                playClickSound();
-                            }
-                        }, t + soundDuration));
-                    }
-                })(j);
-            }
-        }
-    }
-    return timeToFinishRow;
 }
 
 /* Play a single sound
