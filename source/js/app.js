@@ -530,7 +530,7 @@ function scheduleSoundPattern(offset) {
             sonifyScheduledSounds();
         }    
     } else {
-        clearBtns()
+        clearBtns();
         $('#errContainer').append('<div class="col-md-12 err">Error. Please upload a file with numerical data</div>');
     }
 }
