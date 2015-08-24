@@ -4,4 +4,4 @@
 This tool has a purpose to allow a user to play with different kinds of sonification techniques.
 The system is being developed at QMUL Auditory Displays and Data sonification Research Group.
 
-Check http://www.sonify.co.nf to see the system live.
+Check http://datson.co.nf to see the website live.
